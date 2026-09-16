@@ -12,7 +12,8 @@ python3 -m venv .venv   #Create
 source .venv/bin/activate   #Activate
 deactivate  #leaves it
 ```
-
+```
 * Run without activating
 .venv/bin/pip install requests
 .venv/bin/python script.py
+````
