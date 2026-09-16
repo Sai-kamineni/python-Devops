@@ -17,9 +17,17 @@ Run without activating <br>
 `.venv/bin/pip install requests` <br>
 `.venv/bin/python script.py`
 
-## REPL
+### REPL
 Run python3 with no filename and you land in the REPL - an interactive prompt where you type one line of Python and see the result straight away. REPL stands for Read, Evaluate, Print, Loop. It reads what you type, runs it, prints the result, and waits for the next line.
 ```
 python3
 ```
 To leave, type exit() and press Enter, or press Ctrl and D together.
+
+### Printing values
+print() writes its arguments to the screen, followed by a newline:
+
+```
+print("service is up")
+print(42)
+````
