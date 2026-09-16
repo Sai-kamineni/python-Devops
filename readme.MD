@@ -13,7 +13,7 @@ source .venv/bin/activate       #Activate
 deactivate                      #leaves it
 ```
 
-Run without activating
-`.venv/bin/pip install requests`
+Run without activating <br>
+`.venv/bin/pip install requests` <br>
 `.venv/bin/python script.py`
 
