@@ -24,7 +24,7 @@ python3
 ```
 To leave, type exit() and press Enter, or press Ctrl and D together.
 
-### Printing values
+#### Printing values
 print() writes its arguments to the screen, followed by a newline:
 
 ```
