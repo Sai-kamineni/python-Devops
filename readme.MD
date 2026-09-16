@@ -30,4 +30,5 @@ print() writes its arguments to the screen, followed by a newline:
 ```
 print("service is up")
 print(42)
+print("cpu count", 4)           #Pass several values
 ````
