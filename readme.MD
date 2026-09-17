@@ -1032,3 +1032,84 @@ for name in names:
     upper.append(name.upper())
 ```
 Three lines of setup and loop just to transform each item.
+
+##### The comprehension
+The same result in one line:
+```
+upper = [name.upper() for name in names]
+```
+
+Read it left to right: for each name in names, produce name.upper(), and collect the results into a new list. The expression on the left is what each item becomes; the for part on the right is where the items come from.
+
+##### The shape
+Every list comprehension follows the same skeleton:
+`[expression for item in collection]`
+
+The expression runs once per item and its result goes into the new list. The original collection is left untouched.
+
+##### Why use them
+Comprehensions are shorter and, once the shape is familiar, easier to read than the loop-and-append version. In DevOps scripts you'll use them constantly to turn one list into another: hostnames into URLs, raw strings into integers, paths into filenames. When the transform is simple, a comprehension says it in one clear line.
+
+#### Filtering with an if clause
+Add an if to the end of a comprehension to keep only the items you want. This is how you filter a list down as you build the new one.
+```
+[expression for item in collection if condition]
+```
+
+The if runs for each item. When it's true, the item's expression goes into the new list. When it's false, the item is skipped.
+
+##### An example
+Keep only the servers whose name starts with web-:
+```
+servers = ["web-01", "db-01", "web-02", "cache-01"]
+web = [s for s in servers if s.startswith("web-")]
+print(web)   # ['web-01', 'web-02']
+```
+
+Only the two web- names survive. The rest are filtered out.
+
+##### Filter and transform at once
+The expression and the filter are independent, so you can reshape the items you keep in the same line:
+```
+ports = [8080, 22, 443, 9090, 80]
+high = [p for p in ports if p >= 1024]
+print(high)   # [8080, 9090]
+```
+
+Here the filter drops the low port numbers and the surviving values land in the new list. You could just as easily transform them, for example str(p) to turn each kept port into a string.
+
+##### When the filter gets complex
+The if clause can use and, or, and not like any condition. But if the test grows long, or you need more than a simple keep-or-skip, a regular for loop with an if inside is clearer. Use the filtering comprehension when the condition stays short and the intent is obvious.
+
+#### Dictionary comprehensions
+A dictionary comprehension builds a dict in one line, the same idea as a list comprehension but producing key/value pairs. It's the clean way to turn a list into a lookup table.
+```
+{key_expression: value_expression for item in collection}
+```
+The curly braces and the colon are what make it a dict instead of a list. For each item you produce one key and one value.
+
+##### Building a lookup from a list
+Say you have server names and want a dict mapping each name to the length of its name:
+```
+names = ["web", "db", "cache"]
+sizes = {name: len(name) for name in names}
+print(sizes)   # {'web': 3, 'db': 2, 'cache': 5}
+```
+
+##### Parsing pairs into a dict
+A common real task is turning name:value strings into a dict. Split each string, then use the two parts as key and value:
+```
+raw = ["web:8080", "db:5432"]
+ports = {pair.split(":")[0]: int(pair.split(":")[1]) for pair in raw}
+print(ports)   # {'web': 8080, 'db': 5432}
+```
+
+split(":") breaks each string in two; [0] is the name and [1] is the port, and int() turns the port text into a number.
+
+##### Filtering works here too
+Just like a list comprehension, you can add an if to keep only some pairs:
+```
+busy = {name: hits for name, hits in counts.items() if hits > 100}
+```
+Looping over .items() gives you the key and value to test and reuse. When a transform stays simple, a dict comprehension is the most direct way to reshape one collection into a lookup.
+
