@@ -1327,3 +1327,91 @@ print(usage_percent(18, 40))
 ```
 
 Run main.py and it pulls usage_percent out of helpers.py. The two files now share one copy of that function. Fix a bug in helpers.py and every script that imports it gets the fix.
+
+##### How Python finds the file
+When you write import helpers, Python looks for helpers.py starting in the same folder as the script you ran. That's why keeping a module next to the script that imports it just works. Modules from the standard library and installed packages are found through other search locations, but your own module living beside your script is the simple case.
+
+##### Importing runs the file
+The first time a module is imported, Python runs it top to bottom to define its functions and values. If helpers.py has a stray print at the top level, that line runs on import. Keep a module to definitions, functions and constants, so importing it has no surprise side effects.
+
+## 14.pip and PyPI
+The standard library is broad, but it doesn't cover everything. When you need something like requests for HTTP or boto3 for AWS, you install it with pip. pip is Python's package installer, and it pulls from PyPI, the public index where the Python community publishes libraries.
+
+##### Installing a package
+The basic command names the package you want:
+```
+pip install requests
+```
+
+pip contacts PyPI, downloads requests and anything it depends on, and puts them where your Python can import them. After that, import requests works in your code.
+
+##### Seeing what's installed
+Two commands tell you what's already there:
+```
+pip list
+pip show requests
+```
+
+pip list prints every installed package and its version. pip show gives details about one package, including its version and what it depends on.
+
+##### Dependencies come along
+Most packages rely on other packages. requests alone pulls in a handful of supporting libraries for URLs and certificates. pip resolves that whole tree for you and installs everything needed, which is the main reason you never copy library files by hand.
+
+##### A quick note on where it installs
+Where a package lands depends on whether a virtual environment is active. Inside an active venv, pip install drops the package into that venv. Outside one, it targets the system or user Python. The next nodes tie pip together with venvs and a requirements file so installs are both isolated and repeatable.
+
+#### requirements.txt
+Installing packages one command at a time works until someone else has to reproduce your setup. A requirements.txt file lists every package a project needs, one per line, so anyone can install the whole set with a single command. It's the standard way to record a project's dependencies.
+
+##### The format
+Each line names a package, optionally with a version:
+```
+requests==2.31.0
+pyyaml==6.0.1
+```
+
+The == pins the exact version. requests==2.31.0 means that version and no other. Pinning matters because a project that worked with one version can break when a newer release changes behavior. Pinned versions mean the install you get today is the install you get in six months.
+
+##### Installing from the file
+The -r flag tells pip to read a requirements file and install everything listed:
+```
+pip install -r requirements.txt
+```
+
+One command, and the whole dependency set is in place. This is what runs in a Dockerfile, a CI job, or a teammate's first setup.
+
+##### Generating it with pip freeze
+You don't have to write the file by hand. pip freeze prints every installed package with its exact version, already in requirements format:
+```
+pip freeze
+```
+
+Redirect it into the file to capture your current environment:
+```
+pip freeze > requirements.txt
+```
+The catch is that freeze lists everything installed, including dependencies of dependencies. Run it inside a clean virtual environment that holds only your project's packages, and the output stays meaningful instead of dumping the whole system.
+
+#### venv and reproducible installs
+A virtual environment and a requirements file solve two halves of the same problem. The venv keeps a project's packages isolated from the system and other projects. The requirements file records exactly what goes in it. Put together, they let anyone recreate your setup from scratch. You met venv back in the first topic; here it joins up with pinned requirements.
+
+##### The full workflow
+Starting a project cleanly is four steps:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install requests
+pip freeze > requirements.txt
+```
+
+Create the isolated environment, activate it so pip targets it, install what you need, then freeze the result into requirements.txt. Because the venv held only your packages, the frozen file lists only what the project actually uses.
+
+##### Recreating it elsewhere
+On another machine, or after deleting the venv, the same project comes back with:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Same venv, same pinned versions, same result. This is the pattern behind reproducible builds: the environment is disposable, and the requirements file is the source of truth you commit to version control.
