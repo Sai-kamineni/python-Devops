@@ -924,3 +924,111 @@ range(0, 10, 2)  # 0, 2, 4, 6, 8
 ```
 
 The stop value is always excluded. This off-by-one is deliberate and becomes natural quickly. Reach for range when you need counting; reach for a plain for item in collection when you already have the items.
+
+### while loops
+A `while` loop repeats its block as long as a condition stays true. Use it when you don't know up front how many times to loop, only the condition that should stop it.
+
+The shape
+```
+attempts = 0
+while attempts < 3:
+    print("trying", attempts)
+    attempts = attempts + 1
+```
+
+Python checks the condition before each pass. While it's true, the block runs. Once it's false, the loop stops and the script moves on.
+
+##### Something in the loop must change the condition
+The block has to move the condition toward false, or the loop never ends. Here attempts grows by one each pass until it reaches 3. Forget that line and you have an infinite loop that hangs the script.
+
+#### for or while
+When you want to repeat something a set number of times, for produces a sequence of integers to loop over:while when there's no fixed list and you're waiting on a condition, like polling until a service reports ready or retrying until a counter runs out.
+```
+retries = 5
+while retries > 0:
+    print("polling, retries left:", retries)
+    retries = retries - 1
+```
+
+### Looping over lists and dictionaries
+A for loop works on any collection, not just lists. Dictionaries and their keys and values are just as loopable, and a couple of built-ins make the common patterns clean.
+
+##### Looping over a list with its index
+Sometimes you want the position as well as the item. enumerate hands you both:
+```
+servers = ["web-01", "web-02", "db-01"]
+for index, server in enumerate(servers):
+    print(index, server)
+```
+
+That prints 0 web-01, 1 web-02, 2 db-01. enumerate counts from 0 by default.
+
+##### Looping over a dictionary
+Looping over a dict directly gives you its keys:
+```
+ports = {"web": 8080, "db": 5432}
+for name in ports:
+    print(name, ports[name])
+```
+
+##### items(), keys(), and values()
+To get keys and values together in one step, loop over .items():
+```
+for name, port in ports.items():
+    print(name, "listens on", port)
+```
+
+.items() yields each key/value pair, which you unpack into two variables. .keys() gives just the keys and .values() gives just the values, if you only need one side.
+
+##### Building a result while you loop
+A very common pattern is starting with an empty accumulator and updating it each pass:
+```
+total = 0
+for port in ports.values():
+    total = total + port
+print(total)
+```
+
+This is how you count events, sum sizes, or collect matches out of a collection, one item at a time.
+
+### break and continue
+Two keywords steer a loop from the inside. break stops the loop early, and continue skips to the next item. Both work in for and while loops.
+
+##### break: stop looping now
+`break` exits the loop immediately, skipping any remaining items. It's how you stop as soon as you've found what you were looking for:
+```
+servers = ["web-01", "web-02", "db-01"]
+for server in servers:
+    if server == "db-01":
+        print("found the database")
+        break
+```
+Once break runs, the loop is done and the script continues after it. There's no point scanning the rest of the list once you have your answer.
+
+##### continue: skip to the next item
+continue abandons the current pass and jumps straight to the next item, leaving the rest of the block unrun for that item:
+```
+counts = [12, 0, 45, 0, 7]
+for count in counts:
+    if count == 0:
+        continue
+    print("processing", count)
+```
+
+Here the zero entries are skipped and only the non-zero ones print. continue keeps the loop going; it just short-cuts this one pass.
+
+##### When to use which
+Use break when the whole loop is finished, like finding a match or hitting a retry limit. Use continue to filter out items you want to ignore without nesting the rest of the body inside an if. Both keep loop bodies flatter and easier to read than piling on conditions.
+
+## 11.List comprehensions
+A list comprehension builds a new list from an existing collection in one line. It replaces the very common pattern of creating an empty list and appending to it in a loop.
+
+##### The long way
+Here's the pattern a comprehension shortens:
+```
+names = ["web-01", "db-01"]
+upper = []
+for name in names:
+    upper.append(name.upper())
+```
+Three lines of setup and loop just to transform each item.
