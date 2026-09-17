@@ -745,3 +745,64 @@ print(len(set(ips)))   # 3
 ```
 That single line answers questions like "how many unique client IPs hit this endpoint" or "how many distinct users appear in this log".
 
+##### Getting a clean list back
+If you need an ordered list again after removing duplicates, wrap the set in sorted() to get a sorted list, or list() to get one in no particular order:
+```
+clean = sorted(set(ips))
+print(clean)   # ['10.0.0.1', '10.0.0.2', '10.0.0.3']
+```
+
+##9.if, elif, and else
+An if statement runs a block of code only when a condition is true. Add elif to test more conditions, and else to catch everything left over. This is how a script makes a decision instead of doing the same thing every time.
+
+The basic if
+```
+cpu = 92
+if cpu > 90:
+    print("CPU is critical")
+```
+
+The expression after if evaluates to true or false. When it's true, the indented block runs. When it's false, Python skips the block and carries on.
+
+##### Indentation defines the block
+Python has no curly braces. The indented lines under an if are its block, and four spaces is the standard indent. Every line at that indent belongs to the block. The first line that dedents ends it.
+```
+if cpu > 90:
+    print("critical")
+    print("paging on-call")
+print("done")   # not indented, so it always runs
+```
+
+#### elif and else
+Chain more tests with elif, and give a fallback with else:
+```
+if cpu > 90:
+    print("critical")
+elif cpu > 70:
+    print("warning")
+else:
+    print("ok")
+```
+
+Python checks the conditions top to bottom, runs the first block whose condition is true, and skips the rest. else runs only when none of the conditions matched.
+
+#### Comparison operators
+Six operators compare two values and hand back a boolean, True or False. They are what you put inside an if condition.
+
+The six operators
+```
+a == b   # equal
+a != b   # not equal
+a <  b   # less than
+a >  b   # greater than
+a <= b   # less than or equal
+a >= b   # greater than or equal
+```
+
+Each one evaluates to a boolean on its own:
+```
+print(5 > 3)      # True
+print(5 == 3)     # False
+print(5 != 3)     # True
+```
+
