@@ -177,3 +177,13 @@ print(port + 1)          # 8081
 ratio = float("0.75")    # 0.75 as a float
 count_text = str(4)      # "4" as a string
 ```
+
+#### How bool converts
+bool() follows a simple rule - "empty" or "zero" values become False, everything else becomes True:
+```
+print(bool(0))       # False
+print(bool(""))      # False
+print(bool(None))    # False
+print(bool(5))       # True
+print(bool("ok"))    # True
+```
