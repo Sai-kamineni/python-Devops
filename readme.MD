@@ -552,3 +552,47 @@ A dictionary maps keys to values. Where a list finds items by numeric position, 
 'config = {"app": "billing", "port": 8080, "debug": False}'
 
 Each pair joins a key on the left to a value on the right. Here the key "app" maps to the value "billing", and "port" maps to 8080.
+
+##### Why dictionaries fit DevOps work
+Configuration, JSON payloads, API responses, and environment settings are all key-to-value data. A dictionary is the shape that data takes in Python, so you'll meet dictionaries constantly. This structure reads much better than trying to remember that the port lives at index 1 of some list.
+
+##### Keys and values
+Values can be anything: strings, numbers, booleans, even lists or other dictionaries. Keys are almost always strings in the config and JSON data you'll handle:
+```
+server = {
+    "hostname": "web-01",
+    "ports": [80, 443],
+    "healthy": True,
+}
+```
+
+Splitting a dictionary across lines like this, one pair per line, is the usual style once it grows past two or three keys. The trailing comma after the last pair is allowed and makes edits cleaner.
+
+##### Keys are unique
+Each key appears once. If you write the same key twice, the last value wins:
+```
+d = {"port": 80, "port": 8080}
+print(d)   # {'port': 8080}
+```
+Splitting a dictionary across lines like this, one pair per line, is the usual style once it grows past two or three keys. The trailing comma after the last pair is allowed and makes edits cleaner.
+
+##### Keys are unique
+Each key appears once. If you write the same key twice, the last value wins:
+```
+d = {"port": 80, "port": 8080}
+print(d)   # {'port': 8080}
+```
+
+##### Reading a value by key
+Put the key in square brackets:
+```
+config = {"app": "billing", "port": 8080}
+print(config["app"])    # billing
+print(config["port"])   # 8080
+```
+
+If the key isn't there, this raises a KeyError and stops your program:
+```
+print(config["region"])
+# KeyError: 'region'
+```
