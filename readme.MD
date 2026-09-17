@@ -806,3 +806,89 @@ print(5 == 3)     # False
 print(5 != 3)     # True
 ```
 
+##### One equals sign assigns, two compares
+This trips up everyone at least once. A single = assigns a value. A double == asks whether two values are equal.
+```
+status = "ok"      # assignment
+if status == "ok": # comparison
+    print("healthy")
+```
+Writing if status = "ok" is a syntax error, which is Python saving you from a classic bug.
+
+##### Comparisons work on strings too
+== and != compare strings for an exact match, which is how you check a status code or an environment name:
+```
+env = "prod"
+if env == "prod":
+    print("be careful")
+```
+
+##### Comparisons produce values you can store
+A comparison is just an expression, so you can save its result:
+```
+over_budget = cost > 100
+print(over_budget)   # True or False
+```
+
+##### and: both must be true
+and is true only when the expressions on both sides are true.
+```
+cpu = 85
+memory = 92
+if cpu > 80 and memory > 90:
+    print("both under pressure")
+```
+
+##### or: at least one must be true
+or is true when either side is true.
+```
+if cpu > 90 or memory > 90:
+    print("something is critical") 
+```
+
+##### not: flip it
+not turns true into false and false into true. It reads well in front of a single test:
+```
+healthy = False
+if not healthy:
+    print("investigate")
+```
+
+##### Use parentheses when you mix them
+and binds tighter than or, which can surprise you. When a condition mixes both, add parentheses to make the grouping obvious to the reader and to Python:
+```
+if (env == "prod" and cpu > 80) or disk > 95:
+    print("alert")
+```
+
+##### Short-circuiting
+Python stops evaluating as soon as the answer is decided. With and, if the left side is false, the right side is never checked. With or, if the left side is true, the right side is skipped. This lets you guard a risky test with a cheaper one on its left, and it's the reason the order of your conditions can matter.
+
+##### The falsy values
+A short, fixed list of values count as false. Everything else counts as true.
+```
+False
+None
+0 and 0.0
+"", the empty string
+[], (), {}, and an empty set, the empty collections
+```
+
+So an empty list is falsy, but a list with anything in it is truthy. A non-empty string is truthy. The number 0 is falsy, 1 is truthy.
+
+##### Test a value directly
+Because collections are falsy when empty, you can check them without comparing lengths:
+```
+servers = []
+if not servers:
+    print("no servers to check")
+That reads better than if len(servers) == 0, and it does the same job.
+```
+
+##### None means "no value yet"
+None is Python's stand-in for missing or not-set. It's falsy, which makes it easy to check for:
+```
+alert_email = ""
+if not alert_email:
+    print("alert email is not configured")
+```
