@@ -1242,3 +1242,88 @@ print(count)   # error: count is not defined out here
 A variable defined at the top level of your script is global, and functions can read it. But assigning to a name inside a function creates a new local one, separate from any global with the same name. Keeping data flowing through arguments and return values, rather than reaching for globals, keeps functions predictable and easy to test.
 
 ## 13.import, from, and as
+A module is a file of Python code that someone else wrote, full of functions and values you can use. The import statement pulls a module into your script so you can reach what's inside it. Python ships with hundreds of modules, and this is how you get at them.
+
+##### import the whole module
+The plain form loads a module and gives you access through its name:
+```
+import os
+print(os.getcwd())
+```
+
+After import os, everything the os module provides is available under the os. prefix. os.getcwd() calls the getcwd function that lives inside os. The prefix makes it obvious where the function came from, which helps when a script imports several modules.
+
+##### from ... import a specific name
+When you only want one or two things from a module, import them directly so you can use them without the prefix:
+```
+from os import getcwd
+print(getcwd())
+```
+Now getcwd is available on its own. This reads well when you use a name often, but too many bare imports make it hard to tell which module each one came from.
+
+##### as gives it a shorter name
+as renames what you import, usually to shorten a long module name or avoid a clash:
+```
+import subprocess as sp
+sp.run(["ls"])
+```
+
+You'll see this constantly in real code, where libraries have a conventional short alias.
+
+#### The standard library
+Python comes with a large collection of modules called the standard library. They install with Python itself, so you can import them on any machine without running pip. For DevOps work, a handful come up constantly. This node is a quick tour so you recognize them; later topics dig into each one.
+
+os: talk to the operating system
+The os module works with the environment, paths, and the filesystem:
+```
+import os
+print(os.getcwd())
+print(os.environ.get("HOME"))
+```
+
+os.getcwd() returns the current directory, and os.environ reads environment variables. This is your bridge from Python to the machine it runs on.
+
+##### sys: the interpreter and its arguments
+The sys module is about Python itself and how it was launched:
+```
+import sys
+print(sys.argv)
+print(sys.version)
+```
+
+sys.argv holds the command-line arguments passed to your script, which is how a tool reads its own flags.
+
+##### json: structured data
+The json module converts between JSON text and Python dicts and lists, the format APIs and config files use everywhere:
+```
+import json
+data = json.loads('{"status": "ok"}')
+print(data["status"])
+```
+
+###datetime: dates and times
+The datetime module handles timestamps, which you'll want for log lines and scheduling:
+```
+import datetime
+print(datetime.datetime.now())
+```
+
+#### Writing your own module
+A module is just a .py file. Any Python file you write can be imported by another file, which lets you keep shared functions in one place and use them from several scripts. There's nothing special to declare; the filename becomes the module name.
+
+##### Splitting code across files
+Say you have a file helpers.py with a useful function:
+```
+# helpers.py
+def usage_percent(used, total):
+    return round(used / total * 100)
+```
+
+A second file in the same folder can import and use it. You import by the filename without the .py:
+```
+# main.py
+from helpers import usage_percent
+print(usage_percent(18, 40))
+```
+
+Run main.py and it pulls usage_percent out of helpers.py. The two files now share one copy of that function. Fix a bug in helpers.py and every script that imports it gets the fix.
