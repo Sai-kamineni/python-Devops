@@ -596,3 +596,30 @@ If the key isn't there, this raises a KeyError and stops your program:
 print(config["region"])
 # KeyError: 'region'
 ```
+
+##### Reading safely with get
+get looks up a key but returns None instead of raising when the key is missing. Pass a second argument to choose your own fallback:
+```
+print(config.get("region"))            # None
+print(config.get("region", "unset"))   # unset
+print(config.get("port", 80))          # 8080
+```
+
+Reach for get whenever a key might be absent, which is common with config and API data where fields are optional. It turns a crash into a sensible default.
+
+##### Updating and adding keys
+Assigning to a key sets its value. If the key exists, you overwrite it; if it doesn't, you add it. Same syntax either way:
+```
+config["port"] = 9090            # updates the existing key
+config["region"] = "us-east-1"   # adds a new key
+print(config)                   # {'app': 'billing', 'port': 9090, 'region': 'us-east-1'}
+````
+
+This is the everyday way you build a dictionary up: start with a few keys, or none, and assign more as you go.
+
+##### Removing a key
+pop removes a key and returns its value:
+```
+removed = config.pop("region")
+print(removed)   # us-east-1
+```
