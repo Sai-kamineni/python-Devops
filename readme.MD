@@ -650,3 +650,78 @@ len counts the pairs in the dictionary, same as it counts items in a list:
 `print(len(config))   # 2`
 
 ## 8.Sets
+A set is an unordered collection of unique values. Two things make it different from a list: it never holds duplicates, and it doesn't keep any order. Write one with curly braces:
+```
+ports = {80, 443, 8080}
+```
+
+##### Duplicates disappear
+If you put the same value in twice, the set keeps just one copy. This is the defining behavior:
+```
+ports = {80, 443, 80, 8080, 443}
+print(ports)   # {80, 443, 8080}
+```
+
+##### No order, no indexing
+A set doesn't track position, so there's no first or last item and you can't index it. This fails:
+```
+ports[0]
+# TypeError: 'set' object is not subscriptable
+```
+When you print a set the items may come out in any order. If you need order or indexing, you want a list, not a set.
+
+##### Making a set from a list
+Passing a list to set() builds a set from its values, dropping any duplicates along the way. This is the most common way you'll create a set in practice:
+```
+hosts = ["web-01", "web-02", "web-01"]
+unique = set(hosts)
+print(unique)   # {'web-01', 'web-02'}
+```
+
+##### Membership and size
+The in operator and len work just like they do on a list, and in on a set is very fast even when the set is large:
+```
+print("web-01" in unique)   # True
+print(len(unique))          # 2
+```
+
+##### The empty set gotcha
+Empty braces {} make an empty dictionary, not an empty set. For an empty set you must call set():
+
+`empty = set()`
+
+#### Union, intersection, and difference
+The reason to reach for a set is often to compare two collections. Sets answer three questions directly: what's in either, what's in both, and what's in one but not the other.
+
+Take two sets to work with:
+```
+allowed = {"nginx", "curl", "git", "vim"}
+installed = {"nginx", "git", "htop"}
+```
+
+##### Union: in either set
+Union combines both sets into one, keeping every value once. Use the | operator or the union method:
+```
+print(allowed | installed)
+# {'nginx', 'curl', 'git', 'vim', 'htop'}
+```
+
+##### Intersection: in both sets
+Intersection keeps only the values present in both. Use & or the intersection method:
+```
+print(allowed & installed)
+# {'nginx', 'git'}
+```
+This answers "which allowed packages are actually installed".
+
+##### Difference: in one but not the other
+Difference keeps the values in the left set that aren't in the right one. Use - or the difference method. Order matters here:
+```
+print(allowed - installed)
+# {'curl', 'vim'}     allowed but not installed
+
+print(installed - allowed)
+# {'htop'}            installed but not allowed
+```
+
+These two differences answer different questions. allowed - installed is what's missing, and installed - allowed is what shouldn't be there.
