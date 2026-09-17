@@ -133,7 +133,7 @@ ready = is_healthy and not in_maintenance
 ```
 and is True only when both sides are True. or is True when either side is. not flips a value.
 
-####None means no value
+#### None means no value
 None is a special value that stands for "nothing here yet" or "no result". It is its own type, and it is not the same as 0, False, or an empty string:
 ```
 last_error = None    # no error has happened
@@ -146,3 +146,34 @@ print(last_error is None)   # True
 Use is None and is not None rather than == when checking for None. It is the idiomatic form and reads clearly.
 
 #### Checking and converting types
+Every value in Python has a type, and the type() function tells you what it is:
+```
+print(type(4))         # <class 'int'>
+print(type(0.75))      # <class 'float'>
+print(type("web-01"))  # <class 'str'>
+print(type(True))      # <class 'bool'>
+```
+
+##### Why conversion matters
+Values often arrive as the wrong type. A port number read from a config file or an environment variable comes in as the string "8080", not the number 8080. You cannot do math on a string:
+```
+port = "8080"
+print(port + 1)        # TypeError, can't add int to str
+```
+
+You have to convert it first. This is one of the most common fixes in DevOps scripting, because so much input arrives as text.
+
+#### The conversion functions
+Four built-in functions convert between the core types:
+
+int(x) turns a value into an integer.
+float(x) turns a value into a float.
+str(x) turns a value into a string.
+bool(x) turns a value into a boolean.
+```
+port = int("8080")       # 8080 as an int
+print(port + 1)          # 8081
+
+ratio = float("0.75")    # 0.75 as a float
+count_text = str(4)      # "4" as a string
+```
