@@ -101,3 +101,48 @@ Combine an int and a float and the result is a float, because Python widens to t
 print(4 + 0.5)       # 4.5
 print(3 * 2.0)       # 6.0
 ```
+
+#### Readability with underscores
+Large numbers are hard to read, so Python lets you group digits with underscores. They are ignored by the interpreter and are purely for your eyes:
+
+```
+max_bytes = 1_000_000
+```
+
+### Booleans and None
+A boolean is a truth value, one of exactly two options - True or False. Both are capitalized, and both are keywords, not strings:
+```
+is_healthy = True
+in_maintenance = False
+```
+
+#### Comparisons produce booleans
+You rarely type True and False by hand. More often they come out of a comparison:
+```
+print(4 > 2)         # True
+print(10 == 10)      # True
+print("a" == "b")    # False
+```
+
+The comparison operators are == for equal, != for not equal, and <, >, <=, >= for ordering. Note that == compares values, while a single = assigns a variable - mixing them up is a classic bug.
+
+#### Combining conditions
+Combine booleans with and, or, and not:
+```
+ready = is_healthy and not in_maintenance
+```
+and is True only when both sides are True. or is True when either side is. not flips a value.
+
+####None means no value
+None is a special value that stands for "nothing here yet" or "no result". It is its own type, and it is not the same as 0, False, or an empty string:
+```
+last_error = None    # no error has happened
+```
+You will see None returned by functions that have nothing useful to give back, and used as a placeholder before a real value is known. To test for it, compare with is:
+```
+print(last_error is None)   # True
+```
+
+Use is None and is not None rather than == when checking for None. It is the idiomatic form and reads clearly.
+
+#### Checking and converting types
