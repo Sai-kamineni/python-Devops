@@ -1228,3 +1228,15 @@ configure(retries=3, timeout=30)
 ```
 
 Here settings is the dict {"retries": 3, "timeout": 30}. This is handy when a function passes options through to something else without needing to know every option in advance.
+
+##### Scope: where a variable lives
+A variable created inside a function is local. It exists only while the function runs and vanishes when it returns:
+```
+def worker():
+    count = 5
+
+worker()
+print(count)   # error: count is not defined out here
+```
+
+A variable defined at the top level of your script is global, and functions can read it. But assigning to a name inside a function creates a new local one, separate from any global with the same name. Keeping data flowing through arguments and return values, rather than reaching for globals, keeps functions predictable and easy to test.
