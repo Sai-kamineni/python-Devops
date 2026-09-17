@@ -346,7 +346,7 @@ Unlike a single index, a slice that runs past the end does not error. It just st
 print(name[:100])  # "web-01", no error
 ```
 
-### lists
+## 5.lists
 A list is an ordered collection of values kept in a single variable. Write one with square brackets and commas between the items:
 ```
 servers = ["web-01", "web-02", "db-01"]
