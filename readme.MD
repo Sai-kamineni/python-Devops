@@ -61,6 +61,43 @@ Pick names that say what the value means. db_host tells a reader far more than x
 Python lets you assign multiple names on one line, which is handy for related values:
 
 `host, port = "10.0.0.5", 8080` <br>
+
 Now host holds the string and port holds the number.
 
+#### Numbers - int and float
+```
+cpu_count = 4        # int
+load_average = 0.75  # float
+```
 
+#### Arithmetic
+```
+total = 8 + 4        # 12
+free = 16 - 3        # 13
+scaled = 5 * 3       # 15
+```
+
+Division with / always gives a float, even when the result is whole:
+```
+print(10 / 2)        # 5.0, a float
+```
+
+When you want a whole number, use floor division //, which divides and drops the remainder. The modulo operator % gives you that remainder:
+
+```
+print(17 // 5)       # 3
+print(17 % 5)        # 2
+```
+
+#### Powers
+Two asterisks raise a number to a power, which is handy for sizes and byte math:
+```
+print(2 ** 10)       # 1024
+```
+
+#### Mixing int and float
+Combine an int and a float and the result is a float, because Python widens to the type that can hold a decimal:
+```
+print(4 + 0.5)       # 4.5
+print(3 * 2.0)       # 6.0
+```
