@@ -35,8 +35,32 @@ print("cpu count", 4)           #Pass several values
 
 #### Variables
 
-`hostname = "web-01"`
+`hostname = "web-01"` <br>
 `cpu_count = 4`
 
 Read that as "hostname is now web-01". After this, using the name hostname anywhere gives you back its value. There is no separate declaration step and you do not state a type - Python figures out the type from the value you assign.
+
+```
+retries = 3
+retries = retries + 1   # now 4
+status = "pending"
+status = "done"         # replaces the old string
+````
+The old value is simply forgotten. Nothing about the first assignment is permanent.
+
+#### Naming rules and conventions
+Names must start with a letter or underscore and can contain letters, digits, and underscores. They cannot contain spaces or start with a digit. Names are case sensitive, so Host and host are different variables.
+````
+max_retries = 5
+db_host = "10.0.0.5"
+is_healthy = True
+````
+Pick names that say what the value means. db_host tells a reader far more than x or h, and clear names are the cheapest documentation a script can have.
+
+#### Assigning several at once
+Python lets you assign multiple names on one line, which is handy for related values:
+
+`host, port = "10.0.0.5", 8080` <br>
+Now host holds the string and port holds the number.
+
 
