@@ -1113,3 +1113,53 @@ busy = {name: hits for name, hits in counts.items() if hits > 100}
 ```
 Looping over .items() gives you the key and value to test and reuse. When a transform stays simple, a dict comprehension is the most direct way to reshape one collection into a lookup.
 
+## 12.Defining functions with def
+A function is a named block of code you can run whenever you need it. Instead of copying the same lines into three places, you write them once, give them a name, and call that name. The def keyword defines one.
+```
+def greet():
+    print("deploy starting")
+```
+
+##### Calling a function
+You call a function by writing its name followed by parentheses:
+```
+greet()
+greet()
+```
+That runs the body twice and prints the line twice. The parentheses are what trigger the call. The name on its own, without them, just refers to the function without running it.
+
+#### Arguments and return values
+A function that always does the exact same thing is limited. Arguments let you pass data in, and a return value lets you get a result back out. Together they turn a function into a reusable tool.
+
+Passing data in with arguments
+List the inputs a function needs between its parentheses. These names are called parameters:
+```
+def greet(name):
+    print("deploying", name)
+
+greet("web")
+greet("db")
+```
+
+When you call greet("web"), the string "web" becomes name inside the function. Call it again with a different value and the function does its work on that value instead. A function can take several parameters, separated by commas:
+```
+def report(service, status):
+    print(service, "is", status)
+
+report("web", "healthy")
+```
+
+##### Getting a result back with return
+print shows a value on screen. return hands a value back to whatever called the function, so you can store it or use it further:
+```
+def percent(used, total):
+    return used / total * 100
+
+usage = percent(18, 40)
+print(usage)
+```
+
+The call percent(18, 40) evaluates to 45.0, which gets stored in usage. That's the key difference: a function that prints only shows you something, while a function that returns gives you a value to keep working with.
+
+##### return ends the function
+As soon as Python hits return, the function stops and hands back the value. Any lines after it don't run. A function with no return returns the special value None.
