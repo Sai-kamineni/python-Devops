@@ -187,3 +187,41 @@ print(bool(None))    # False
 print(bool(5))       # True
 print(bool("ok"))    # True
 ```
+
+#### 4.Strings
+A string is a piece of text. You write one by wrapping characters in quotes, and Python accepts single or double quotes with no difference in meaning:
+```
+name = 'web-01'
+role = "database"
+message = "it's healthy"
+path = 'the "prod" cluster'
+```
+
+##### Escaping and special characters
+A backslash starts an escape sequence. The two you will meet most are \n for a newline and \t for a tab:
+```
+print("line one\nline two")
+```
+That prints across two lines. To put a literal backslash in a string, double it as \\.
+
+##### Multi-line strings
+Triple quotes, either ''' or """, let a string span several lines exactly as written:
+```
+banner = """
+deploy-bot
+version 1.0
+"""
+```
+
+##### Joining and repeating
+The + operator joins strings end to end, and * repeats one:
+```
+full = "web" + "-" + "01"   # "web-01"
+rule = "=" * 20              # twenty equals signs
+```
+
+##### Length
+The built-in len() function returns how many characters a string holds:
+```
+print(len("web-01"))   # 6
+```
