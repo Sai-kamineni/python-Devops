@@ -1240,3 +1240,5 @@ print(count)   # error: count is not defined out here
 ```
 
 A variable defined at the top level of your script is global, and functions can read it. But assigning to a name inside a function creates a new local one, separate from any global with the same name. Keeping data flowing through arguments and return values, rather than reaching for globals, keeps functions predictable and easy to test.
+
+## 13.import, from, and as
