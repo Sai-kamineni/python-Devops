@@ -225,3 +225,47 @@ The built-in len() function returns how many characters a string holds:
 ```
 print(len("web-01"))   # 6
 ```
+
+##### Trimming whitespace
+.strip() removes whitespace from both ends of a string, including stray spaces, tabs, and newlines. It is the first thing you do to any value read from a file or command, where trailing newlines are common:
+```
+raw = "  web-01\n"
+print(raw.strip())    # "web-01"
+```
+
+##### Changing case
+.upper() and .lower() return the string with every letter shifted to one case. Lowercasing is a standard way to compare values without worrying about how they were typed:
+```
+print("Web-01".upper())   # "WEB-01"
+print("Web-01".lower())   # "web-01"
+```
+
+##### Splitting into pieces
+.split() breaks a string into a list of pieces. With no argument it splits on runs of whitespace. Give it a separator to split on that instead:
+```
+"web-01 web-02 db-01".split()      # three items, split on spaces
+"a,b,c".split(",")                  # split on commas
+```
+
+This is how you pull fields out of a log line or a comma-separated value. Lists get their own topic next, so for now just know .split() is what turns one string into separate fields.
+
+##### Joining pieces together
+.join() is the reverse of .split(). You call it on the separator string and pass the pieces you want glued together, and it returns one string with that separator between each piece:
+```
+names = ["web", "api", "monitor"]
+print(", ".join(names))   # "web, api, monitor"
+```
+The separator is whatever string you call .join() on, so "-".join gives you web-api-monitor and "".join glues the pieces with nothing between them. This is how you turn a list of values back into a single line for printing or writing to a file.
+
+##### Replacing text
+.replace(old, new) returns a copy with every occurrence of one substring swapped for another:
+```
+print("web_01".replace("_", "-"))   # "web-01"
+```
+
+##### Testing content
+The in operator checks whether one string appears inside another and returns a boolean. It is the quick way to scan a line for a keyword:
+```
+line = "ERROR disk full"
+print("ERROR" in line)   # True
+```
