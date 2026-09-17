@@ -1452,3 +1452,25 @@ KeyError: a dictionary key doesn't exist.
 ValueError: a value has the right type but a wrong content, like int("abc").
 ZeroDivisionError: you divided by zero.
 Knowing the type matters, because handling errors well means catching the specific type you expect, which the next node covers.
+
+#### try and except
+A try/except block lets your script attempt something risky and react when it fails, instead of crashing. You put the code that might raise an exception in the try block, and the recovery code in the except block.
+```
+try:
+    config = open("/etc/app.conf")
+except FileNotFoundError:
+    print("config missing, using defaults")
+```
+
+If open succeeds, the except block is skipped entirely. If it raises FileNotFoundError, Python jumps straight to the except block and runs it. Either way the script keeps going instead of stopping on a traceback.
+
+##### Catch the specific type
+Name the exception type you expect, as above with FileNotFoundError. This matters. A bare except that catches everything will also swallow bugs you didn't intend to hide, like a typo in a variable name, and leave you debugging in the dark:
+```
+try:
+    value = data["port"]
+except KeyError:
+    value = 22
+```
+
+Here you're saying "if the key is missing, fall back to 22", and only a missing key triggers the fallback. Any other error still surfaces, as it should.
