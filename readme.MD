@@ -459,7 +459,7 @@ print(servers.index("db-01"))   # 2
 
 If the value isn't in the list, index raises an error, so check with in first when you aren't sure it's there.
 
-## 5.tuple
+## 6.tuple
 A tuple is an ordered collection of values, just like a list, with one key difference: once you create it, you can't change it. Write one with parentheses and commas:
 ```
 server = ("web-01", "10.0.0.5", 8080)
@@ -475,3 +475,74 @@ print(server[0])    # web-01
 print(server[-1])   # 8080
 ```
 Slicing works too, and a slice of a tuple gives back a new tuple.
+
+##### You can't change a tuple
+Trying to assign to an item raises an error rather than changing anything:
+```
+server[2] = 9090    # TypeError: 'tuple' object does not support item assignment
+```
+
+There's no append, no remove, no pop. A tuple is fixed from the moment you create it.
+
+##### The one-item gotcha
+A single value in parentheses is not a tuple, it's just that value. The comma is what makes a tuple, so a one-item tuple needs a trailing comma:
+```
+not_a_tuple = ("web-01")     # just the string "web-01"
+one_tuple = ("web-01",)      # a tuple with one item
+```
+
+#### Tuples vs lists
+A list is mutable. You build it up, sort it, and remove from it as your program runs. A tuple is immutable. Once created, its contents are locked:
+```
+hosts = ["web-01", "web-02"]   # a list, can change
+hosts.append("web-03")         # fine
+
+record = ("web-01", "10.0.0.5", 8080)   # a tuple, fixed
+record.append("x")             # AttributeError, no such method
+```
+
+##### When a tuple is the right choice
+Use a tuple when the collection represents one thing made of a fixed set of parts, and changing any part would make it a different thing. A server's (hostname, ip, port) is a good example: swapping the IP doesn't edit the record, it describes a different server.
+
+Immutability buys you a guarantee. If a value is a tuple, you know no other part of the program quietly changed it out from under you. That makes code easier to reason about.
+
+##### When a list is the right choice
+Use a list when the collection is a bag of similar items that grows, shrinks, or gets reordered: a list of hostnames you're collecting, a queue of tasks to work through, results you append as you go.
+
+##### A rough rule of thumb
+If you find yourself thinking "record" or "a fixed group of related fields", reach for a tuple. If you're thinking "a collection I'll add to or change", reach for a list. Both index the same way, so you lose nothing in readability by picking the honest one.
+
+##### Tuple unpacking
+Unpacking assigns the items of a tuple to several variables in one line. Put the names on the left, matching the number of items:
+```
+server = ("web-01", "10.0.0.5", 8080)
+hostname, ip, port = server
+print(hostname)   # web-01
+print(ip)         # 10.0.0.5
+print(port)       # 8080
+```
+
+This is much clearer than pulling each item out by index with server[0], server[1], and server[2]. The names tell the reader what each position means.
+
+##### The counts must match
+You need exactly as many names as there are items. Too few or too many raises an error:
+```
+a, b = ("web-01", "10.0.0.5", 8080) # ValueError: too many values to unpack
+```
+
+##### Unpacking works on lists too
+Unpacking isn't tuple-only. It works on any ordered collection, including a list, as long as the counts line up:
+```
+first, second = ["web-01", "web-02"]
+```
+
+##### Swapping values
+A neat trick falls out of unpacking: you can swap two variables in one line, with no temporary variable, because the right side is packed into a tuple first and then unpacked:
+```
+a, b = 1, 2
+a, b = b, a
+print(a, b)   # 2 1
+```
+
+You'll see unpacking constantly once loops and dictionaries arrive, since many built-ins hand back tuples that read best when unpacked into named variables.
+
