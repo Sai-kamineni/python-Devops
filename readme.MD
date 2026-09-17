@@ -1163,3 +1163,55 @@ The call percent(18, 40) evaluates to 45.0, which gets stored in usage. That's t
 
 ##### return ends the function
 As soon as Python hits return, the function stops and hands back the value. Any lines after it don't run. A function with no return returns the special value None.
+
+#### Default and keyword arguments
+Two features make function calls clearer and more flexible: default values that fill in when you leave an argument out, and keyword arguments that name the value you're passing.
+
+##### Default values
+Give a parameter a default with = in the definition. If the caller skips it, the default is used:
+```
+def connect(host, port=22):
+    print("connecting to", host, "on", port)
+
+connect("web01")
+connect("web01", 2222)
+```
+
+The first call uses port 22, the default. The second overrides it with 2222. Defaults are perfect for the common case, letting callers set a value only when they need something other than the usual.
+
+Parameters with defaults must come after parameters without them. def connect(port=22, host) is an error.
+
+##### Keyword arguments
+Normally arguments match parameters by position, left to right. You can instead pass them by name, which is called a keyword argument:
+
+`connect(host="web01", port=2222)`
+
+The order no longer matters when you name them, and the call documents itself. Compare these two calls:
+```
+create_user("deploy", True, False)
+create_user("deploy", admin=True, locked=False)```
+
+The second is far easier to read six months later. Nobody has to guess what True, False means.
+
+##### Mixing positional and keyword
+You can combine both, but positional arguments must come first:
+```
+connect("web01", port=2222)
+```
+
+Here "web01" matches host by position, and port is named. A common habit is to pass the obvious required values positionally and name the optional ones.
+
+#### *args, **kwargs, and scope
+Sometimes you don't know ahead of time how many arguments a function will get. Two special parameters handle that, and a separate rule called scope decides which variables a function can see.
+
+##### *args collects extra positional arguments
+A parameter written with a * in front gathers any leftover positional arguments into a tuple:
+```
+def deploy(*services):
+    for name in services:
+        print("deploying", name)
+
+deploy("web", "db", "cache")
+```
+
+Inside the function, services is the tuple ("web", "db", "cache"). The caller can pass one name, five, or none, and the loop handles whatever arrives. The name args is just convention; the * is what does the work.
