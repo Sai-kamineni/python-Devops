@@ -188,7 +188,7 @@ print(bool(5))       # True
 print(bool("ok"))    # True
 ```
 
-#### 4.Strings
+### 4.Strings
 A string is a piece of text. You write one by wrapping characters in quotes, and Python accepts single or double quotes with no difference in meaning:
 ```
 name = 'web-01'
