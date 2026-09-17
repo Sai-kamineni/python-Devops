@@ -1415,3 +1415,31 @@ pip install -r requirements.txt
 ```
 
 Same venv, same pinned versions, same result. This is the pattern behind reproducible builds: the environment is disposable, and the requirements file is the source of truth you commit to version control.
+
+##### What to commit and what to ignore
+Commit requirements.txt. Never commit the .venv folder. The venv is large, machine-specific, and fully rebuildable from the requirements file, so it belongs in .gitignore. Anyone who clones the project rebuilds their own venv from the pinned list.
+
+## 15.Exceptions and tracebacks
+When Python hits something it can't do, dividing by zero, opening a file that isn't there, it raises an exception. An exception is Python's way of saying "I can't continue with this", and unless you handle it, the whole script stops on the spot.
+
+##### What a crash looks like
+Try to open a file that doesn't exist:
+```
+open("/etc/missing.conf")
+```
+
+Python prints a traceback and exits:
+```
+Traceback (most recent call last):
+  File "script.py", line 1, in <module>
+    open("/etc/missing.conf")
+```
+
+FileNotFoundError: [Errno 2] No such file or directory: '/etc/missing.conf'
+
+##### Reading a traceback
+A traceback is not noise, it's a map. Read it bottom to top:
+
+The last line is the exception type and message. Here it's FileNotFoundError and the file it couldn't find. This tells you what went wrong.
+The lines above show where it happened, tracing back through the calls that led there, with file names and line numbers.
+The bottom line is where to look first. FileNotFoundError on a path tells you the path is wrong or the file is missing, before you read another word.
