@@ -1443,3 +1443,12 @@ A traceback is not noise, it's a map. Read it bottom to top:
 The last line is the exception type and message. Here it's FileNotFoundError and the file it couldn't find. This tells you what went wrong.
 The lines above show where it happened, tracing back through the calls that led there, with file names and line numbers.
 The bottom line is where to look first. FileNotFoundError on a path tells you the path is wrong or the file is missing, before you read another word.
+
+##### Exception types
+Every failure has a type, and the type tells you the category of problem:
+
+FileNotFoundError: the file or directory isn't there.
+KeyError: a dictionary key doesn't exist.
+ValueError: a value has the right type but a wrong content, like int("abc").
+ZeroDivisionError: you divided by zero.
+Knowing the type matters, because handling errors well means catching the specific type you expect, which the next node covers.
