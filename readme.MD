@@ -32,3 +32,11 @@ print("service is up")
 print(42)
 print("cpu count", 4)           #Pass several values
 ````
+
+#### Variables
+
+`hostname = "web-01"`
+`cpu_count = 4`
+
+Read that as "hostname is now web-01". After this, using the name hostname anywhere gives you back its value. There is no separate declaration step and you do not state a type - Python figures out the type from the value you assign.
+
