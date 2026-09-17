@@ -623,3 +623,29 @@ pop removes a key and returns its value:
 removed = config.pop("region")
 print(removed)   # us-east-1
 ```
+
+##### keys, values, and items
+keys gives you all the keys, values gives you all the values, and items gives you each key-value pair together:
+```
+config = {"app": "billing", "port": 8080}
+print(list(config.keys()))     # ['app', 'port']
+print(list(config.values()))   # ['billing', 8080]
+print(list(config.items()))    # [('app', 'billing'), ('port', 8080)]
+```
+
+Notice that items hands back each pair as a tuple. Wrapping the result in list() here just makes it print cleanly; you'll most often feed these straight into a loop once loops arrive.
+
+##### Checking for a key with in
+The in operator checks whether a key is present, returning True or False. It looks at keys, not values:
+```
+print("app" in config)        # True
+print("region" in config)     # False
+print("billing" in config)    # False, that's a value not a key
+```
+
+This pairs naturally with get and with plain lookups. Check in before reaching for config["key"] when you aren't sure the key is there and you want to avoid a KeyError.
+
+##### How many keys with len
+len counts the pairs in the dictionary, same as it counts items in a list:
+`print(len(config))   # 2`
+
