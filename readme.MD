@@ -725,3 +725,23 @@ print(installed - allowed)
 ```
 
 These two differences answer different questions. allowed - installed is what's missing, and installed - allowed is what shouldn't be there.
+
+#### Deduplicating with sets
+Because a set can't hold duplicates, converting a collection to a set is the fastest way to strip repeats out of data. This is one of the most common jobs a set does in real scripts.
+
+The pattern
+Wrap a list in set() and the duplicates vanish:
+```
+ips = ["10.0.0.1", "10.0.0.2", "10.0.0.1", "10.0.0.3", "10.0.0.2"]
+unique = set(ips)
+print(unique)   # {'10.0.0.1', '10.0.0.2', '10.0.0.3'}
+```
+
+##### Counting unique values
+Very often you don't even want the values, just how many distinct ones there are. Combine set() with len():
+```
+ips = ["10.0.0.1", "10.0.0.2", "10.0.0.1", "10.0.0.3", "10.0.0.2"]
+print(len(set(ips)))   # 3
+```
+That single line answers questions like "how many unique client IPs hit this endpoint" or "how many distinct users appear in this log".
+
