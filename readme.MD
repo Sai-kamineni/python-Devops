@@ -373,3 +373,88 @@ Negative indexes count from the end, which saves you from working out the length
 print(servers[-1])  # db-01
 print(servers[-2])  # web-02
 ```
+##### Slicing out a range
+A slice pulls several items at once with start:stop. The start is included and the stop is not:
+```
+nums = [10, 20, 30, 40, 50]
+print(nums[1:3])    # [20, 30]
+print(nums[:2])     # [10, 20]
+print(nums[2:])     # [30, 40, 50]
+```
+
+##### Changing an item in place
+Assign to an index to replace whatever was there:
+```
+servers = ["web-01", "web-02", "db-01"]
+servers[1] = "web-99"
+print(servers)   # ['web-01', 'web-99', 'db-01']
+```
+
+##### Adding items
+append adds one item to the end. It's the workhorse you'll use to collect results as a program runs:
+```
+servers = ["web-01"]
+servers.append("web-02")
+print(servers)   # ['web-01', 'web-02']
+```
+
+insert puts an item at a specific index and shifts the rest right:
+```
+servers.insert(0, "lb-01")
+print(servers)   # ['lb-01', 'web-01', 'web-02']
+```
+
+##### Removing items
+remove deletes the first item that matches a value:
+```
+servers.remove("web-01")
+print(servers)   # ['lb-01', 'web-02']
+```
+
+pop removes an item by index and hands it back to you. With no index it removes and returns the last item, which is handy for draining a list one item at a time:
+```
+last = servers.pop()
+print(last)      # web-02
+print(servers)   # ['lb-01']
+```
+These methods change the list they're called on and return either nothing (append, insert, remove) or the removed item (pop). There's no new list to catch, so don't write servers = servers.append(x).
+
+##### len
+len returns the number of items. It's a built-in function, so the list goes in the parentheses:
+```
+servers = ["web-01", "web-02", "db-01"]
+print(len(servers))   # 3
+```
+
+##### Sorting
+There are two ways to sort, and the difference matters. sort is a method that reorders the list in place and returns nothing:
+```
+nums = [30, 10, 20]
+nums.sort()
+print(nums)   # [10, 20, 30]
+```
+
+`sorted` is a built-in function that leaves the original alone and hands back a new sorted list:
+```
+nums = [30, 10, 20]
+ordered = sorted(nums)
+print(ordered)   # [10, 20, 30]
+print(nums)      # [30, 10, 20]
+```
+
+Reach for sorted when you still need the original order, and sort when you don't. Both take reverse=True to go high to low.
+
+##### Membership with in
+The in operator checks whether a value is present and gives back True or False:
+```
+print("db-01" in servers)   # True
+print("db-99" in servers)   # False
+```
+
+##### Finding a position with index
+index returns the position of the first matching item:
+```
+print(servers.index("db-01"))   # 2
+````
+
+If the value isn't in the list, index raises an error, so check with in first when you aren't sure it's there.
