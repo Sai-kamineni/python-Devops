@@ -1505,3 +1505,42 @@ else:
 ```
 Why not just put that line at the end of try? Because else makes the intent explicit. The try holds only the risky call, and else holds what to do once it worked. It also avoids accidentally catching an exception from the follow-up code, since else sits outside the protected block.
 
+##### finally: always run
+Code in finally runs whether the try succeeded, raised, or was even caught. It's for cleanup that must happen either way, like releasing a resource:
+```
+try:
+    conn = open_connection()
+    use(conn)
+except ConnectionError:
+    print("connection failed")
+finally:
+    close_connection()
+```
+
+The connection gets closed no matter how the block ends. Without finally, an exception would skip your cleanup and leak the resource.
+
+##### Putting it together
+A full block reads in order: try the risky thing, handle failures in except, do the success-only work in else, and always clean up in finally. You rarely need all four at once, but knowing each one lets you write exactly the flow you mean.
+
+#### Raising exceptions
+Catching errors is one half of the story. The other half is raising them yourself. When your code detects a condition it can't sensibly continue past, raise stops it with a clear error instead of limping on with bad data.
+
+##### The raise statement
+raise triggers an exception on purpose. You pick the type and give it a message:
+```
+def set_port(port):
+    if port < 1 or port > 65535:
+        raise ValueError("port must be between 1 and 65535")
+    return port
+```
+
+Call set_port(70000) and it raises ValueError with your message. The caller can catch it, or let it surface as a traceback. Either way, the function refused to hand back a nonsense value.
+
+##### Why raise instead of returning a bad value
+A function that silently returns None or -1 on bad input pushes the problem downstream, where it shows up later as a confusing failure far from the real cause. Raising fails loudly at the exact point the problem was detected, with a message that says what's wrong. That's easier to debug and harder to ignore.
+
+##### Write messages that help
+The message is what a tired engineer reads at 2 a.m. Make it specific. raise ValueError("port must be between 1 and 65535") beats raise ValueError("bad input"), because it names the rule that was broken. Include the offending value when it helps.
+
+##### Choosing a type
+Use a built-in type that fits: ValueError for a bad value, KeyError for a missing key, FileNotFoundError for a missing file. Matching the type lets callers catch precisely what they expect, the same way you catch the standard library's exceptions.
