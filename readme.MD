@@ -269,3 +269,43 @@ The in operator checks whether one string appears inside another and returns a b
 line = "ERROR disk full"
 print("ERROR" in line)   # True
 ```
+
+#### f-strings
+An f-string builds a string with values dropped straight into it. Put an f before the opening quote, then wrap any expression in curly braces inside the text. Python replaces each brace with the value:
+```
+host = "web-01"
+port = 8080
+print(f"connecting to {host} on port {port}")
+```
+
+That prints connecting to web-01 on port 8080. This is the modern, readable way to assemble output, and you will use it constantly for log lines, messages, and report text.
+
+##### Why f-strings beat joining with plus
+Without f-strings you would glue pieces together with + and convert every non-string by hand:
+```
+print("connecting to " + host + " on port " + str(port))
+```
+
+That is noisy and easy to get wrong. An f-string converts values for you, so you can drop a number straight in without str().
+
+##### Any expression fits in the braces
+The braces are not limited to plain variable names. Any expression works, and it is evaluated on the spot:
+```
+cpus = 4
+print(f"total threads {cpus * 2}")
+print(f"host is {host.upper()}")
+```
+
+##### Formatting numbers
+A colon inside the braces starts a format spec. Two show up often - rounding a float to a fixed number of decimals, and padding a number to a width:
+```
+ratio = 0.75123
+print(f"usage {ratio:.2f}")     # usage 0.75
+```
+The .2f means "a float with two digits after the point". You will reach for this whenever raw floats look untidy in a report.
+
+##### Printing a variable and its value
+An = right before the closing brace prints both the expression and its value, which is a fast debugging trick:
+```
+print(f"{port=}")   # port=8080
+```
