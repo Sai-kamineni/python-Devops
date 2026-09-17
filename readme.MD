@@ -649,3 +649,4 @@ This pairs naturally with get and with plain lookups. Check in before reaching f
 len counts the pairs in the dictionary, same as it counts items in a list:
 `print(len(config))   # 2`
 
+## 8.Sets
