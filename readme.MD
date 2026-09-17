@@ -1474,3 +1474,34 @@ except KeyError:
 ```
 
 Here you're saying "if the key is missing, fall back to 22", and only a missing key triggers the fallback. Any other error still surfaces, as it should.
+
+##### Handling more than one type
+A block can have several except clauses for different problems:
+```
+try:
+    port = int(raw_value)
+except ValueError:
+    print("port is not a number")
+except KeyError:
+    print("port was not set")
+```
+Python runs the first clause whose type matches the exception raised.
+
+##### Why this matters for DevOps
+Automation runs unattended. A missing file, an unreachable host, or a malformed config shouldn't take down the whole run. Catching the errors you expect lets a script log the problem, fall back to a default, or skip one item and carry on with the rest.
+
+#### else and finally
+A try block can take two more clauses beyond except. The else clause runs only when no exception was raised, and finally runs no matter what happens. Both make cleanup and control flow clearer.
+
+##### else: run only on success
+Code in else runs when the try block finished without raising:
+```
+try:
+    port = int(raw_value)
+except ValueError:
+    print("not a number")
+else:
+    print("port is", port)
+```
+Why not just put that line at the end of try? Because else makes the intent explicit. The try holds only the risky call, and else holds what to do once it worked. It also avoids accidentally catching an exception from the follow-up code, since else sits outside the protected block.
+
