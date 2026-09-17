@@ -892,3 +892,35 @@ alert_email = ""
 if not alert_email:
     print("alert email is not configured")
 ```
+
+## 10.for loops and range
+A for loop runs a block once for each item in a sequence. It's the workhorse of automation, where you almost always have a list of servers, files, or records to process the same way.
+
+Looping over a list
+```
+servers = ["web-01", "web-02", "db-01"]
+for server in servers:
+    print("checking", server)
+```
+
+On each pass, the variable after for (here server) holds the next item. The indented block runs once per item. The loop ends when the list runs out.
+
+##### The loop variable is yours to name
+server is just a name you pick. Choose something that describes one item, so the body reads clearly. for s in servers works but for server in servers is easier to follow.
+
+range: loop a fixed number of times
+When you want to repeat something a set number of times, range produces a sequence of integers to loop over:
+```
+for i in range(3):
+    print("attempt", i)
+```
+That prints 0, 1, 2. range(3) counts from 0 up to but not including 3, so it yields three numbers.
+
+##### range with a start and step
+range takes up to three arguments, start, stop, and step:
+```
+range(1, 4)      # 1, 2, 3
+range(0, 10, 2)  # 0, 2, 4, 6, 8
+```
+
+The stop value is always excluded. This off-by-one is deliberate and becomes natural quickly. Reach for range when you need counting; reach for a plain for item in collection when you already have the items.
