@@ -1189,7 +1189,8 @@ Normally arguments match parameters by position, left to right. You can instead 
 The order no longer matters when you name them, and the call documents itself. Compare these two calls:
 ```
 create_user("deploy", True, False)
-create_user("deploy", admin=True, locked=False)```
+create_user("deploy", admin=True, locked=False)
+```
 
 The second is far easier to read six months later. Nobody has to guess what True, False means.
 
@@ -1215,3 +1216,15 @@ deploy("web", "db", "cache")
 ```
 
 Inside the function, services is the tuple ("web", "db", "cache"). The caller can pass one name, five, or none, and the loop handles whatever arrives. The name args is just convention; the * is what does the work.
+
+##### **kwargs collects extra keyword arguments
+Two stars gather leftover keyword arguments into a dictionary:
+```
+def configure(**settings):
+    for key, value in settings.items():
+        print(key, "=", value)
+
+configure(retries=3, timeout=30)
+```
+
+Here settings is the dict {"retries": 3, "timeout": 30}. This is handy when a function passes options through to something else without needing to know every option in advance.
