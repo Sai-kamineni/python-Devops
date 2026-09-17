@@ -309,3 +309,67 @@ An = right before the closing brace prints both the expression and its value, wh
 ```
 print(f"{port=}")   # port=8080
 ```
+
+#### Slicing and indexing
+Indexing a single character
+Indexes start at 0, so the first character is at position 0, the second at 1, and so on. Put the index in square brackets:
+```
+name = "web-01"
+print(name[0])    # "w"
+print(name[3])    # "-"
+```
+
+Negative indexes count from the end, so -1 is the last character:
+```
+print(name[-1])   # "1"
+```
+
+##### Slicing a range
+A slice uses [start:stop] and returns the characters from start up to but not including stop:
+```
+print(name[0:3])   # "web"
+print(name[4:6])   # "01"
+```
+
+The stop position is excluded, so name[0:3] gives you three characters, at positions 0, 1, and 2. This off-by-one feels odd at first but becomes second nature.
+
+##### Leaving out start or stop
+Omit start and the slice runs from the beginning. Omit stop and it runs to the end:
+```
+print(name[:3])    # "web", from the start
+print(name[4:])    # "01", to the end
+```
+
+##### Slices never overflow
+Unlike a single index, a slice that runs past the end does not error. It just stops at the end of the string, which makes slicing safe to use on input of unknown length:
+```
+print(name[:100])  # "web-01", no error
+```
+
+### lists
+A list is an ordered collection of values kept in a single variable. Write one with square brackets and commas between the items:
+```
+servers = ["web-01", "web-02", "db-01"]
+```
+
+Lists keep their order, so the item you put first stays first. They can hold any type, and you can even mix types in one list, though in practice you'll usually keep a list to one kind of thing:
+```
+ports = [80, 443, 8080]
+mixed = ["web-01", 8080, True]
+empty = []
+```
+
+##### Reaching an item by index
+Each item has a position, called its index, starting at 0. Use square brackets with the index to read one item:
+```
+servers = ["web-01", "web-02", "db-01"]
+print(servers[0])   # web-01
+print(servers[2])   # db-01
+```
+
+Counting from zero trips up everyone at first. The third item is at index 2, not 3.
+Negative indexes count from the end, which saves you from working out the length just to grab the last item:
+```
+print(servers[-1])  # db-01
+print(servers[-2])  # web-02
+```
