@@ -1731,3 +1731,141 @@ print(config["service"])
 ```
 
 json.load(f) reads the whole file and parses it in one step, so you get back a dict or list directly. Combined with the with statement, the file is parsed and closed cleanly.
+
+##### Writing a file with dump
+json.dump takes the object first and the open file second:
+```
+import json
+
+config = {"service": "api", "port": 8080}
+with open("/etc/myapp/config.json", "w") as f:
+    json.dump(config, f, indent=2)
+```
+
+Open the file in write mode, pass indent=2 for a readable layout, and the dict is written out as JSON. This is the standard way to persist structured state, such as a generated config or a cache of API results.
+
+##### load versus loads
+Keep the two pairs straight:
+
+load and dump work with a file object.
+loads and dumps work with a string.
+Reach for the file pair when the data is on disk, and the string pair when you already hold the JSON as text, such as an API response body.
+
+##### What this node introduces
+json.load(f) reads and parses JSON from an open file.
+json.dump(obj, f, indent=2) writes an object as JSON to an open file.
+The file pair load/dump versus the string pair loads/dumps.
+
+## 18.YAML and PyYAML
+YAML is the config format you meet everywhere in DevOps: Kubernetes manifests, Ansible playbooks, GitHub Actions and GitLab CI pipelines, Docker Compose files. It stores the same kind of structured data as JSON but is written to be easy for people to read and edit.
+
+Python does not parse YAML out of the box. The standard library is PyYAML, imported as yaml, and it is already installed on this lab machine.
+```
+import yaml
+```
+
+##### Why YAML for config
+YAML earns its place in config files for a few reasons:
+
+Indentation shows structure, so there are no braces or brackets to balance.
+It allows comments with #, which JSON does not. Config files live and die by good comments.
+Strings usually need no quotes, which keeps files clean.
+A small YAML config looks like this:
+```
+# service configuration
+service: api
+port: 8080
+enabled: true
+tags:
+  - web
+  - public
+```
+
+##### The same shapes as JSON
+Under the surface YAML describes the same data model as JSON. That config parses into a Python dict with the keys service, port, enabled, and tags, where tags is a list. Mappings become dicts, sequences become lists, and scalars become strings, numbers, or booleans, exactly like JSON.
+
+Because the result is ordinary dicts and lists, everything you already know about working with them applies. The next node covers the safe way to parse YAML text into those objects.
+
+#### safe_load
+yaml.safe_load parses a YAML string or file into Python dicts and lists. It is the function you should always use to read YAML.
+```
+import yaml
+
+text = """
+service: api
+port: 8080
+tags:
+  - web
+  - public
+"""
+config = yaml.safe_load(text)
+print(config["port"])     # 8080
+```
+
+safe_load accepts either a string of YAML or an open file object, and returns the parsed data.
+
+##### Why safe, and why it matters
+PyYAML also has a plain yaml.load. The problem is that full YAML can describe more than plain data: with the default loader it can be told to construct arbitrary Python objects while parsing. A malicious YAML file can use that to run code on your machine the moment you load it.
+
+In DevOps you routinely load YAML that came from a pull request, a templating step, or a shared repository. Treating that input as trusted code is a real risk. safe_load sidesteps it entirely by refusing to build anything except the basic data types.
+
+##### The rule
+Always use safe_load. Only reach for the unsafe yaml.load if you fully control the file and specifically need a feature safe_load does not support, which is rare. For reading config, safe_load is correct every time.
+```
+import yaml
+
+with open("/etc/myapp/config.yaml") as f:
+    config = yaml.safe_load(f)
+```
+
+##### What this node introduces
+yaml.safe_load(text_or_file) parses YAML into dicts and lists.
+Plain yaml.load can execute arbitrary code from a crafted file.
+Always use safe_load to read YAML, especially from untrusted sources.
+
+#### Dumping YAML
+To turn Python objects back into YAML text, use yaml.safe_dump. It is the writing counterpart to safe_load and, like it, sticks to plain data types so the output is clean, portable YAML.
+```
+import yaml
+
+config = {"service": "api", "port": 8080, "tags": ["web", "public"]}
+print(yaml.safe_dump(config))
+```
+
+That prints:
+```
+port: 8080
+service: api
+tags:
+- public
+- web
+```
+
+##### Controlling the output
+Two keyword arguments come up often:
+
+sort_keys=False keeps your keys in the order you inserted them instead of sorting them alphabetically, which is the default.
+default_flow_style=False forces the expanded block layout you see above, with each item on its own line, rather than the compact inline form.
+python
+```
+print(yaml.safe_dump(config, sort_keys=False))
+```
+
+##### Writing to a file
+Pass an open file as the second argument and safe_dump writes the YAML straight to disk:
+```
+import yaml
+
+config = {"service": "api", "port": 8080}
+with open("/etc/myapp/config.yaml", "w") as f:
+    yaml.safe_dump(config, f, sort_keys=False)
+```
+
+This is how you generate a config file from data your program computed, such as rendering a deployment manifest from a template.
+
+#### What this node introduces
+yaml.safe_dump(obj) renders dicts and lists into YAML text.
+sort_keys=False preserves key order; default_flow_style=False forces the block layout.
+Passing an open file writes the YAML directly to that file.
+
+## 19.The csv module
