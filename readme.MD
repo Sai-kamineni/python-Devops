@@ -2561,3 +2561,101 @@ help= gives an argument its description in the -h output.
 default= sets the value used when an optional argument is omitted.
 type=int converts and validates the value, so you get a number, not a string.
 
+## 25.Logging versus print
+A quick print is fine while you're poking at a script. Once that script runs unattended, on a schedule or as part of a pipeline, print stops being enough. The logging module in the standard library is built for programs that run on their own and need a record of what they did.
+
+##### What print can't do
+A print call always fires, always goes to the same place, and carries no context. When a scheduled job fails at 3am, a screen full of bare print lines tells you little. You can't dial the detail up or down, you can't tell an ordinary message from an emergency, and you can't send the output to a file without redirecting the whole program.
+
+##### What logging adds
+Logging gives you three things print never will:
+
+Severity. Every message has a level, from routine detail up to critical failure, so you can tell what matters at a glance.
+A volume knob. You set a threshold, and messages below it are dropped. Turn up detail while debugging, turn it down in production, without touching the log calls themselves.
+Destinations and format. The same messages can go to the screen, a file, or both, each line stamped with a time and a level.
+
+##### The first log message
+The simplest use looks a lot like print:
+```
+import logging
+logging.warning("disk space is low")
+```
+
+Out of the box this prints WARNING:root:disk space is low. The level is right there in the output, which a plain print could never give you. The next nodes cover the levels and how to control where these lines go and what they look like.
+
+#### What this node introduces
+logging is the standard tool for output from scripts that run unattended.
+It adds severity levels, a threshold to filter by, and control over format and destination.
+logging.warning(...) and its siblings replace print for this.
+
+#### Log levels
+Logging sorts every message into one of five severity levels. Picking the right one is what lets you later filter noise from signal.
+
+##### The five levels
+From least to most severe:
+
+DEBUG is fine-grained detail useful only while diagnosing a problem. Variable values, "entering this function", that sort of thing.
+INFO confirms things are working as expected. "Backup started", "processed 40 records".
+WARNING flags something unexpected that didn't stop the program. "Disk usage at 85 percent", "retrying after a timeout".
+ERROR means an operation failed. "Could not connect to the database", "file not found".
+CRITICAL is a serious failure that may bring the whole program down. "Out of disk", "unrecoverable state".
+Each level has a matching function:
+```
+import logging
+logging.debug("connecting to host")
+logging.info("backup started")
+logging.warning("disk usage at 85 percent")
+logging.error("could not connect to database")
+logging.critical("out of disk space")
+```
+
+##### The threshold
+The level does more than label a message. Logging has a threshold, and anything below it is dropped. The default threshold is WARNING, which is why logging.info(...) on its own seems to print nothing: INFO sits below WARNING and gets filtered out.
+
+That filtering is the point. In production you might run at WARNING and see only problems. While chasing a bug you drop the threshold to DEBUG and suddenly every detail appears, with no change to the log calls themselves. The next node shows how to set that threshold.
+
+##### What this node introduces
+The five levels, from DEBUG up to CRITICAL, and when each fits.
+A matching function for each: logging.debug through logging.critical.
+Messages below the current threshold are dropped; the default threshold is WARNING.
+
+#### Configuring format and handlers
+One function sets up logging for a whole script: logging.basicConfig. It controls the threshold, the look of each line, and where the lines go. Call it once, near the top of your program, before any log calls.
+
+##### Setting the level
+Pass level= to lower the threshold from its WARNING default so more messages get through:
+```
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.info("backup started")
+```
+
+With the threshold at INFO, that message now appears. Set it to logging.DEBUG to see everything.
+
+##### Setting the format
+Pass format= to control what each line looks like. You build it from named fields that logging fills in:
+```
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+```
+
+Now every line is stamped with the time (asctime), its level (levelname), and the text (message), giving output like 2026-07-24 09:00:00,123 INFO backup started. Those percent-named fields are the standard placeholders logging understands.
+
+##### Sending output to a file
+By default logging writes to the screen. Pass filename= to send it to a file instead, which is what you want for a job that runs unattended:
+```
+logging.basicConfig(
+    filename="/root/answers/app.log",
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+```
+
+Every message now appends to that file, each line timestamped and labelled. Under the hood filename= sets up a file handler, the object that decides where log records are written. You can configure handlers directly for more control, but basicConfig covers the common case in one call.
+
+#### What this node introduces
+logging.basicConfig(...) configures logging once for the program.
+level= sets the threshold; format= sets each line's layout using fields like %(asctime)s and %(levelname)s.
+filename= writes to a file through a file handler instead of the screen.
