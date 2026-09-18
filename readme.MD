@@ -2167,3 +2167,72 @@ datetime(y, m, d, ...) and date(y, m, d) build specific values.
 #### Formatting with strftime and strptime
 A datetime prints in a default layout, but reports and filenames need a specific format, and logs arrive as strings you have to read back. Two methods bridge objects and text. strftime turns a datetime into a string, and strptime parses a string into a datetime.
 
+##### strftime: datetime to string
+Call strftime on a datetime with a format made of placeholder codes:
+```
+from datetime import datetime
+
+now = datetime(2026, 7, 24, 14, 3)
+now.strftime("%Y-%m-%d")   # '2026-07-24'
+now.strftime("%d %b %Y")   # '24 Jul 2026'
+now.strftime("%H:%M")      # '14:03'
+```
+
+The common codes:
+    %Y four-digit year, %m two-digit month, %d two-digit day.
+    %H hour (24-hour), %M minute, %S second.
+    %b abbreviated month name, %A full weekday name.
+
+##### strptime: string to datetime
+strptime is a function on the datetime class. Give it the string and a format that describes its shape:
+```
+from datetime import datetime
+
+text = "2026-03-08 15:45:00"
+moment = datetime.strptime(text, "%Y-%m-%d %H:%M:%S")
+moment.year    # 2026
+```
+
+The format must match the input exactly, separators and all. If it doesn't, strptime raises a ValueError.
+
+#### What this node introduces
+    dt.strftime(fmt) formats a datetime as a string.
+    datetime.strptime(text, fmt) parses a string into a datetime.
+    Format codes include %Y %m %d %H %M %S %b %A.
+
+#### timedelta and arithmetic
+Subtract one datetime from another and you get a timedelta, the duration between them. Add a timedelta to a datetime and you get a new datetime shifted by that amount. This is how you answer "how long ago" and "how long until".
+```
+from datetime import datetime, timedelta
+```
+
+##### Subtracting two datetimes
+```
+start = datetime(2026, 3, 1, 9, 30, 0)
+end = datetime(2026, 3, 8, 15, 45, 0)
+gap = end - start
+gap.days             # 7          whole days
+gap.total_seconds()  # 628200.0   the whole span in seconds
+```
+gap.days is the number of complete days. total_seconds() gives the entire duration as seconds, which you can divide to get hours or minutes.
+
+##### Building a duration
+Create a timedelta directly with the units you care about, then add or subtract it:
+```
+deadline = start + timedelta(days=30)
+yesterday = datetime.now() - timedelta(days=1)
+timedelta accepts days, hours, minutes, seconds, and weeks.
+```
+
+##### Comparing moments
+Datetimes compare with the normal operators, so you can check whether one time is before another:
+```
+if datetime.now() > deadline:
+    print("past due")
+```
+
+#### What this node introduces
+    Subtracting two datetimes returns a timedelta.
+    .days and .total_seconds() read a duration.
+    timedelta(days=..., hours=...) builds a duration to add or subtract.
+    Datetimes compare with <, >, and ==.
