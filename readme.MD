@@ -2120,3 +2120,50 @@ print(errors)
 Named groups pull labelled fields out of a structured line.
 \S, \w, and \b match non-whitespace, word characters, and word boundaries.
 Running a pattern over each line of a file counts or extracts events.
+
+## 21.The datetime module
+Working with time in Python starts with the datetime module. It gives you a datetime type for a full moment (date plus time) and a date type for a calendar day on its own.
+```
+from datetime import datetime, date
+```
+
+##### The current moment
+datetime.now() returns the current local date and time as a datetime object:
+```
+now = datetime.now()
+print(now)   # 2026-07-24 14:03:51.412000
+```
+
+date.today() gives just today's calendar date:
+```
+date.today()   # 2026-07-24
+```
+
+##### Building a specific moment
+Pass year, month, and day (and optionally hour, minute, second) to construct an exact value:
+```
+released = datetime(2026, 3, 1, 9, 30, 0)
+deadline = date(2026, 7, 30)
+```
+
+##### Reading the parts
+Every datetime and date exposes its fields as attributes:
+```
+now = datetime.now()
+now.year     # 2026
+now.month    # 7
+now.day      # 24
+now.hour     # 14
+```
+
+These are plain integers, so you can compare them, print them, or feed them into other calculations.
+
+#### What this node introduces
+datetime.now() returns the current date and time.
+date.today() returns the current calendar date.
+datetime(y, m, d, ...) and date(y, m, d) build specific values.
+.year, .month, .day, .hour read the parts.
+
+#### Formatting with strftime and strptime
+A datetime prints in a default layout, but reports and filenames need a specific format, and logs arrive as strings you have to read back. Two methods bridge objects and text. strftime turns a datetime into a string, and strptime parses a string into a datetime.
+
