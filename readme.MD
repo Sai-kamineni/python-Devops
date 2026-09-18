@@ -1960,3 +1960,14 @@ with open("/root/data/out.csv", "w", newline="") as f:
     writer.writerows(rows)
 ```
 
+##### Quoting is handled for you
+Here is the reason not to build CSV with string joins. Suppose a value contains a comma:
+```
+import csv
+
+with open("/root/data/notes.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["web1", "high load, investigating"])
+```
+
+The writer sees the comma inside the value and wraps that field in quotes automatically, producing web1,"high load, investigating". A reader parses it back as two fields, not three. Values with quotes or newlines are escaped the same way. Joining strings with commas yourself would silently corrupt the file the first time a value held a comma.
