@@ -2278,3 +2278,73 @@ os.path.dirname("/root/logs/app.log")   # '/root/logs'
 - os.getcwd() returns the current directory.
 - os.listdir(path) lists a directory; os.makedirs(path) creates one.
 - os.path.join, os.path.exists, os.path.basename, and os.path.dirname build and inspect paths.
+
+#### Environment variables
+Configuration usually reaches a script through environment variables: secrets, region names, feature flags, the current user. Python exposes them through os.environ.
+```
+import os
+```
+
+##### Reading a variable
+os.environ behaves like a dictionary of strings. Index it by name to read a value:
+```
+os.environ["HOME"]   # '/root'
+```
+
+The catch is that indexing a variable that isn't set raises KeyError and crashes the script.
+
+##### Reading safely with get
+os.environ.get returns None, or a default you supply, when the variable is missing, so it never raises:
+```
+os.environ.get("LOG_LEVEL")          # None if unset
+os.environ.get("LOG_LEVEL", "info")  # 'info' if unset
+```
+
+For any optional setting, get with a default is the right habit. It keeps the script running with a sensible fallback instead of failing.
+
+##### Setting a variable
+Assigning to os.environ sets a variable for this process and any programs it launches:
+```
+os.environ["DEPLOY_ENV"] = "staging"
+```
+
+#### What this node introduces
+    os.environ["NAME"] reads a variable and raises KeyError if unset.
+    os.environ.get("NAME", default) reads with a fallback, never raising.
+    Assigning to os.environ sets a variable for this process.
+
+#### sys.argv and exit codes
+The sys module connects your script to how it was run: the arguments on the command line and the exit code it returns. Both matter the moment a script becomes a tool that other scripts call.
+```
+import sys
+```
+
+##### Command-line arguments
+sys.argv is a list of the words on the command line. sys.argv[0] is the script's own name, and the real arguments start at index 1:
+```
+# run as: python3 deploy.py production
+import sys
+sys.argv        # ['deploy.py', 'production']
+sys.argv[1]     # 'production'
+```
+
+If the caller forgot to pass an argument, sys.argv[1] raises IndexError, so check the length first:
+```
+if len(sys.argv) < 2:
+    print("usage: deploy.py <environment>")
+    sys.exit(1)
+```
+
+##### Exit codes
+sys.exit(code) ends the program and returns an exit code to the shell. 0 means success, and any non-zero value signals a specific failure:
+```
+sys.exit(0)   # success
+sys.exit(2)   # a defined error
+```
+
+The shell reads this code as $?, and automation uses it to decide whether the step passed. A script that always exits 0 can't be trusted in a pipeline.
+
+##### What this node introduces
+    sys.argv holds the command-line arguments; real ones start at index 1.
+    Guard against a missing argument by checking len(sys.argv).
+    sys.exit(code) ends the program with an exit code, where 0 is success.
