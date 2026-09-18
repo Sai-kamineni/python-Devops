@@ -2694,3 +2694,22 @@ For a JSON API, you rarely want the raw text. The next node covers turning that 
     import requests loads the library.
     requests.get(url) sends a GET request and returns a response object.
     r.text is the body as a string; r.content is the raw bytes.
+
+#### Status codes and JSON
+Every HTTP response carries a status code, a three-digit number that says whether the request worked. Before you trust a response body, you check that code.
+
+r.status_code
+The response object exposes the code as r.status_code:
+```
+r = requests.get("https://api.github.com/repos/python/cpython")
+print(r.status_code)
+```
+
+The ranges you'll see most:
+
+200 OK, the request succeeded.
+201 Created, common after a successful POST.
+404 Not Found.
+401 and 403, authentication or permission problems.
+500 and up, the server broke.
+
