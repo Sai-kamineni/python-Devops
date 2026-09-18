@@ -1981,3 +1981,142 @@ The writer quotes and escapes values containing commas, quotes, or newlines auto
 Standard pattern is open with newline="", write a header, write rows.
 
 ## 20.The re module
+Python's regular-expression support lives in the re module, part of the standard library. Import it and you can search text for patterns, pull out matching pieces, and check that a string has the shape you expect.
+```
+import re
+```
+
+##### Why raw strings
+Regex patterns lean heavily on the backslash: \d for a digit, \. for a literal dot, \s for whitespace. In a normal Python string the backslash is also an escape character, so "\d" is easy to misread and "\n" turns into a newline. To keep a pattern exactly as written, use a raw string by prefixing it with r:
+```
+pattern = r"\d+\.\d+"
+```
+
+The r tells Python to leave every backslash alone and hand the raw text straight to re. Always write regex patterns as raw strings. It costs nothing and avoids a whole class of confusing bugs.
+
+##### A first match
+The quickest way to try a pattern is re.search, which looks for the pattern anywhere in a string and returns a match object, or None when there's nothing:
+```
+import re
+
+text = "release 1.20 shipped"
+match = re.search(r"\d+\.\d+", text)
+if match:
+    print(match.group())   # 1.20
+```
+
+match.group() returns the slice of text the pattern matched. A None result means no match, which is why the if guard matters before you call .group().
+
+##### search, match, and findall
+Three functions in re cover most day-to-day work. They differ in where they look and what they hand back.
+
+re.search: find one match anywhere
+re.search scans the whole string and returns the first match, or None:
+```
+import re
+re.search(r"\d+", "load is 42 today")   # matches "42"
+re.search(r"\d+", "no numbers here")    # None
+```
+
+##### re.match: anchored at the start
+re.match only matches at the beginning of the string. If the pattern isn't right at the start, it returns None even when the text appears later:
+```
+re.match(r"\d+", "42 servers")   # matches "42"
+re.match(r"\d+", "load is 42")   # None, doesn't start with a digit
+```
+
+Reach for search when the thing you want can sit anywhere. Use match only when you truly mean "must start with".
+
+##### re.findall: every match at once
+re.findall returns a list of every non-overlapping match, which is perfect for pulling repeated values out of a line:
+```
+re.findall(r"\d+", "3 errors, 12 warnings, 5 ok")
+# ['3', '12', '5']
+```
+
+An empty list means nothing matched. Because it returns plain strings, findall is the workhorse for counting and extracting.
+
+##### What this node introduces
+re.search returns the first match anywhere, or None.
+re.match only matches at the start of the string.
+re.findall returns a list of all matches. 
+
+##### Groups and capturing
+Parentheses in a pattern create a capturing group: a sub-part of the match you can pull out on its own. This is how you go from "the line matched" to "here are the exact fields I care about".
+
+##### Numbered groups
+Wrap the piece you want in (). group(1) returns the first group, group(2) the second, and group(0) (or group()) the whole match:
+```
+import re
+m = re.search(r"(\d+)\.(\d+)", "version 1.20 here")
+m.group(0)   # '1.20'  the full match
+m.group(1)   # '1'     first group
+m.group(2)   # '20'    second group
+```
+
+##### groups() returns them all
+m.groups() gives every captured group as a tuple, handy for unpacking:
+```
+major, minor = m.groups()
+```
+
+##### Named groups
+Past a couple of fields, numbers get hard to track. Name a group with (?P<name>...) and read it with group("name"):
+```
+m = re.search(r"user=(?P<user>\w+)", "user=alice action=login")
+m.group("user")   # 'alice'
+```
+
+##### Groups inside findall
+When a pattern has groups, re.findall returns the captured groups instead of the whole match. One group gives a list of strings, two or more gives a list of tuples:
+```
+re.findall(r"(\w+)=(\w+)", "user=alice action=login")
+# [('user', 'alice'), ('action', 'login')]
+```
+
+#### What this node introduces
+() creates a capturing group; group(n) reads it.
+groups() returns all captured groups as a tuple.
+(?P<name>...) names a group; group("name") reads it.
+With groups, findall returns the captured pieces.
+
+#### Parsing log lines
+Log parsing is where regex earns its keep in DevOps work. A log line has a predictable shape, and a single pattern with named groups can break it into fields you can count, filter, and report on.
+
+##### A sample line
+Say your application writes lines like this:
+```
+2026-07-24 08:18:44 ERROR user=bob action=checkout status=500
+````
+Four things matter: the timestamp, the level, the user, and the status code. One pattern captures the ones you need:
+```
+import re
+line = "2026-07-24 08:18:44 ERROR user=bob action=checkout status=500"
+pattern = r"(?P<time>\S+ \S+) (?P<level>\w+) .* status=(?P<status>\d+)"
+
+m = re.search(pattern, line)
+m.group("level")    # 'ERROR'
+m.group("status")   # '500'
+```
+
+\S+ matches non-whitespace, so \S+ \S+ grabs the date and time. \w+ matches the level word. The .* skips the middle, and status=(\d+) pins the status code at the end.
+
+##### Looping over a file
+Open the log, run the pattern on each line, and act on the matches. A common job is counting errors:
+```
+import re
+errors = 0
+with open("/root/logs/app.log") as f:
+    for line in f:
+        if re.search(r"\bERROR\b", line):
+            errors += 1
+
+print(errors)
+```
+
+\b is a word boundary, so \bERROR\b matches the level word ERROR without also matching something like ERRORS or PREERROR.
+
+##### What this node introduces
+Named groups pull labelled fields out of a structured line.
+\S, \w, and \b match non-whitespace, word characters, and word boundaries.
+Running a pattern over each line of a file counts or extracts events.
