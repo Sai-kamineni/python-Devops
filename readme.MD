@@ -2451,7 +2451,7 @@ The exception object still carries .returncode, and .stdout and .stderr when you
     check=True raises an exception on a non-zero exit.
     subprocess.CalledProcessError is that exception; catch it to react.
 
-## 23.argparse basics
+## 24.argparse basics
 A script that needs input can read sys.argv by hand, but then you're writing your own code to check how many arguments came in, print usage when they're wrong, and convert strings to numbers. The argparse module in the standard library does all of that for you and gives your script the same feel as ls or git.
 
 ##### The parser
@@ -2656,6 +2656,6 @@ logging.basicConfig(
 Every message now appends to that file, each line timestamped and labelled. Under the hood filename= sets up a file handler, the object that decides where log records are written. You can configure handlers directly for more control, but basicConfig covers the common case in one call.
 
 #### What this node introduces
-logging.basicConfig(...) configures logging once for the program.
-level= sets the threshold; format= sets each line's layout using fields like %(asctime)s and %(levelname)s.
-filename= writes to a file through a file handler instead of the screen.
+    logging.basicConfig(...) configures logging once for the program.
+    level= sets the threshold; format= sets each line's layout using fields like %(asctime)s and %(levelname)s.
+    filename= writes to a file through a file handler instead of the screen.
