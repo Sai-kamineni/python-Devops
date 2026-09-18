@@ -1869,3 +1869,94 @@ sort_keys=False preserves key order; default_flow_style=False forces the block l
 Passing an open file writes the YAML directly to that file.
 
 ## 19.The csv module
+CSV is the format spreadsheets, billing exports, and monitoring dumps hand you: rows of values separated by commas, one record per line. It looks simple enough to split on commas yourself, but quoting and escaped values make that fragile. The standard library csv module handles the rules for you.
+```
+import csv
+```
+
+##### Reading rows with reader
+csv.reader wraps an open file and yields one row at a time, each row a list of strings:
+```
+import csv
+
+with open("/root/data/metrics.csv", newline="") as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(row)
+```
+
+For a file starting host,cpu,mem, the first row comes back as ["host", "cpu", "mem"]. Every value is a string, so a number like 85 arrives as "85" and you convert it with int() when you need arithmetic.
+
+##### Writing rows with writer
+csv.writer goes the other way. writerow takes a list and writes it as one comma separated line:
+```
+import csv
+
+with open("/root/data/out.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["host", "cpu"])
+    writer.writerow(["web1", "85"])
+```
+
+#### Why newline=""
+Notice newline="" on every open. The csv module manages line endings itself, and passing newline="" stops Python from adding extra blank lines between rows on some systems. Always open CSV files this way.
+
+What this node introduces
+csv.reader(f) yields each row as a list of strings.
+csv.writer(f) writes rows; writerow takes a list for one line.
+Open CSV files with newline="" so line endings are handled correctly.
+
+#### DictReader and DictWriter
+Reading rows as plain lists means referring to columns by number, and row[1] tells you nothing about what that column holds. DictReader fixes this by using the header row to give every value a name.
+
+##### Reading with DictReader
+csv.DictReader reads the first row as the header, then returns each following row as a dict keyed by those column names:
+```
+import csv
+
+with open("/root/data/metrics.csv", newline="") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row["host"], row["cpu"])
+```
+
+For a file starting host,cpu,mem, each row is a dict like {"host": "web1", "cpu": "85", "mem": "40"}. Now you reach for columns by name, which is clearer and survives someone reordering the columns. Values are still strings, so wrap them in int() for math.
+
+##### Writing with DictWriter
+csv.DictWriter is the mirror image. You tell it the column names up front with fieldnames, call writeheader to emit the header row, then pass a dict per row:
+```
+import csv
+
+rows = [{"host": "web1", "cpu": "85"}]
+with open("/root/data/out.csv", "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=["host", "cpu"])
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+```
+
+Each dict's keys must match the fieldnames you declared. DictWriter puts the values in the right column order for you, so you never track positions by hand.
+
+#### What this node introduces
+csv.DictReader(f) yields each row as a dict keyed by the header.
+csv.DictWriter(f, fieldnames=[...]) writes dicts to columns.
+writeheader() emits the header row before the data rows.
+
+#### Writing CSV files
+Writing CSV is where doing it by hand bites you, and where the csv module earns its place. It quotes and escapes values so the file you produce reads back correctly.
+
+##### Writing several rows at once
+You already have writerow for a single row. writerows takes a list of rows and writes them all:
+```
+import csv
+
+rows = [
+    ["host", "cpu"],
+    ["web1", "85"],
+    ["db1", "92"],
+]
+with open("/root/data/out.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerows(rows)
+```
+
