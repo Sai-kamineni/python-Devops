@@ -2706,10 +2706,31 @@ print(r.status_code)
 ```
 
 The ranges you'll see most:
+    200 OK, the request succeeded.
+    201 Created, common after a successful POST.
+    404 Not Found.
+    401 and 403, authentication or permission problems.
+    500 and up, the server broke.
 
-200 OK, the request succeeded.
-201 Created, common after a successful POST.
-404 Not Found.
-401 and 403, authentication or permission problems.
-500 and up, the server broke.
+##### raise_for_status
+Rather than compare numbers by hand, let requests do it. r.raise_for_status() does nothing on a success code but throws an exception on any 4xx or 5xx:
+```
+r = requests.get(url)
+r.raise_for_status()   # stops here if the request failed
+```
 
+This is the clean way to fail fast. Wrap it in the try/except you learned in error handling, and a bad response becomes a caught error instead of a script that carries on with garbage data.
+
+##### r.json()
+Most APIs answer with JSON. Instead of parsing r.text yourself, r.json() decodes the body straight into Python dicts and lists:
+```
+data = r.json()
+print(data["stargazers_count"])
+```
+
+From here it's a normal dictionary. Everything you know about indexing keys and looping over lists applies.
+
+#### What this node introduces
+`r.status_code is the numeric HTTP status.
+r.raise_for_status() raises on a 4xx or 5xx response.
+r.json() parses a JSON body into Python objects.`
