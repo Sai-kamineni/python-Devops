@@ -2450,3 +2450,114 @@ The exception object still carries .returncode, and .stdout and .stderr when you
     result.returncode holds the command's exit code (0 means success).
     check=True raises an exception on a non-zero exit.
     subprocess.CalledProcessError is that exception; catch it to react.
+
+## 23.argparse basics
+A script that needs input can read sys.argv by hand, but then you're writing your own code to check how many arguments came in, print usage when they're wrong, and convert strings to numbers. The argparse module in the standard library does all of that for you and gives your script the same feel as ls or git.
+
+##### The parser
+Start by creating an ArgumentParser. A short description shows up in the tool's help text:
+```
+import argparse
+parser = argparse.ArgumentParser(description="Scale a service")
+```
+
+This object collects the arguments your tool accepts. You describe each one, then ask it to read what the user actually typed.
+
+##### parse_args
+Once the parser knows its arguments, parse_args reads them from the command line and returns an object holding the values:
+```
+args = parser.parse_args()
+```
+
+parse_args looks at what came in on the command line, checks it against the arguments you defined, and stops the program with a helpful message if something is missing or wrong. When it returns, you have clean, validated values to work with.
+
+##### The shape of a tool
+Almost every argparse tool follows the same three steps:
+```
+import argparse
+parser = argparse.ArgumentParser(description="Scale a service")
+# (arguments get added here)
+args = parser.parse_args()
+# (your logic uses args here)
+```
+
+The next nodes fill in the middle: how to add arguments the user must supply, optional flags, and how to control their help text and types.
+
+##### What this node introduces
+    argparse.ArgumentParser(description=...) creates a parser.
+    parser.parse_args() reads and validates the command line.
+    The returned object holds the values your code then uses.
+
+#### Positional and optional arguments
+You add arguments to a parser with add_argument. There are two kinds, and the difference is whether the name starts with a dash.
+
+##### Positional arguments
+A positional argument is required and identified by its place on the command line. Add one by giving add_argument a plain name:
+```
+parser.add_argument("service")
+```
+
+Now the user must supply a value, and it lands on args.service:
+```
+python3 scale.py web
+```
+
+Here args.service is "web". Leave it out and argparse stops the program with a usage message, so you never have to check for it yourself.
+
+##### Optional arguments
+An optional argument starts with -- and, as the name says, can be left out. Add one the same way, with a dashed name:
+```
+parser.add_argument("--replicas")
+```
+
+The user supplies it by flag, in any order:
+```
+python3 scale.py web --replicas 3
+```
+
+argparse drops the leading dashes to name the attribute, so this value lands on args.replicas. Skip the flag and args.replicas is None until you give it a default, which the next node covers.
+
+##### Flags that are just on or off
+Some options are a simple yes or no, like --verbose. Setting action="store_true" makes the argument a switch that's True when present and False when absent, with no value to type:
+```
+parser.add_argument("--verbose", action="store_true")
+```
+
+#### What this node introduces
+    add_argument("name") defines a required positional argument.
+    add_argument("--name") defines an optional flag, read from args.name.
+    action="store_true" makes a flag a simple on/off switch.
+
+#### Help, defaults, and types
+Three keyword arguments to add_argument turn a bare argument into one that documents itself, fills in sensible values, and hands you the right data type.
+
+##### help
+Pass help= to describe an argument. That text shows up when someone runs your tool with -h:
+```
+parser.add_argument("service", help="name of the service to scale")
+parser.add_argument("--replicas", help="how many copies to run")
+```
+
+argparse builds the whole help screen for you, so python3 scale.py -h prints usage plus these descriptions. You never write that screen by hand.
+
+##### default
+An optional argument left out by the user is None unless you set a default. Give it the value the tool should assume:
+```
+parser.add_argument("--replicas", default=1)
+```
+
+Now leaving off --replicas puts 1 on args.replicas instead of None, so the rest of your code doesn't have to handle a missing value.
+
+##### type
+Everything from the command line arrives as a string. "3" is text, not the number 3. Pass type= to have argparse convert it for you:
+```
+parser.add_argument("--replicas", type=int, default=1)
+```
+
+Now args.replicas is a real integer you can do math on. As a bonus, argparse rejects input that can't convert: pass --replicas abc and it stops with a clear error, before your code ever runs. Common choices are type=int and type=float.
+
+#### What this node introduces
+help= gives an argument its description in the -h output.
+default= sets the value used when an optional argument is omitted.
+type=int converts and validates the value, so you get a number, not a string.
+
