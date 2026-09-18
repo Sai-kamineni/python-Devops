@@ -2348,3 +2348,105 @@ The shell reads this code as $?, and automation uses it to decide whether the st
     sys.argv holds the command-line arguments; real ones start at index 1.
     Guard against a missing argument by checking len(sys.argv).
     sys.exit(code) ends the program with an exit code, where 0 is success.
+
+## 23.The subprocess module
+Sometimes the tool you need already exists as a command: df, git, systemctl, kubectl. Rather than reimplement it, you run it from Python and work with what it prints. The subprocess module in the standard library does exactly that.
+
+##### subprocess.run
+The one function you'll reach for is subprocess.run. Pass it the command as a list, where the first item is the program and the rest are its arguments:
+```
+import subprocess
+subprocess.run(["ls", "-l", "/etc"])
+```
+
+This runs ls -l /etc, and its output goes straight to your terminal, just as if you had typed the command yourself. run waits for the command to finish before your Python continues.
+
+##### Why a list, not a string
+Each argument is its own item in the list. You write ["ls", "-l"], not "ls -l". Python hands that list straight to the operating system as the program and its arguments, so nothing reinterprets your spaces or quotes.
+
+There is another form, shell=True, that takes a single string and runs it through the shell:
+```
+subprocess.run("ls -l /etc", shell=True)
+```
+
+It looks convenient, but it hands your string to a full shell, which interprets characters like ;, |, and $. If any part of that string comes from outside your program (a filename a user typed, a value from an API), someone can smuggle in extra commands. That's a command-injection bug. The next scenario looks at it in detail.
+
+The habit to build: use the list form. Reach for shell=True only for a fixed string you wrote yourself, never with untrusted input.
+
+#### Capturing output
+Running a command is only half the job. Most of the time you want to read what it printed and use it in your program: the number of files, a version string, a list of running containers. By default that output goes to the terminal, not to your code. Two arguments change that.
+
+##### capture_output and text
+Pass capture_output=True to grab the command's output instead of letting it print. Pass text=True so you get back a normal string rather than raw bytes:
+```
+import subprocess
+result = subprocess.run(
+    ["df", "-h", "/"],
+    capture_output=True,
+    text=True,
+)
+```
+run returns a result object. What the command printed to standard output is now waiting in result.stdout as a string.
+
+##### Reading stdout and stderr
+A command has two output streams. Normal output goes to .stdout, and error messages go to .stderr:
+```
+print(result.stdout)
+print(result.stderr)
+```
+
+Both are plain strings when you use text=True. You can slice them, split them into lines, or feed them to the string and regex tools you already know:
+```
+lines = result.stdout.splitlines()
+```
+
+##### Why text=True matters
+Without text=True, .stdout comes back as bytes, printed like b'Filesystem ...'. You'd have to decode it yourself before you could work with it. Passing text=True decodes it for you, so you get a string every time. Make it a habit to set both arguments together.
+
+#### What this node introduces
+capture_output=True collects the command's output instead of printing it.
+text=True returns that output as a string, not bytes.
+result.stdout holds normal output; result.stderr holds errors.
+
+#### Return codes and errors
+Every command reports whether it succeeded through an exit code. Zero means success. Anything else means something went wrong, and the number often says what. Automation lives or dies on checking this, because a command that quietly failed can wreck everything downstream.
+
+##### returncode
+The result object carries the exit code in .returncode:
+```
+import subprocess
+result = subprocess.run(["ls", "/nope"], capture_output=True, text=True)
+print(result.returncode) 
+```
+
+For a path that doesn't exist, ls exits non-zero, so .returncode is something like 2. You can branch on it:
+```
+if result.returncode != 0:
+    print("command failed:", result.stderr)
+```
+
+By default run does not care whether the command failed. It hands back the result and lets you decide. If you never look at .returncode, a failure slips by unnoticed.
+
+##### check=True
+When a failed command should stop your program, pass check=True. Now a non-zero exit raises an exception instead of returning quietly:
+```
+subprocess.run(["ls", "/nope"], check=True)
+```
+
+This is the safer default for scripts that must not continue after a failed step, like a deploy that shouldn't proceed if the build broke.
+
+##### CalledProcessError
+The exception check=True raises is subprocess.CalledProcessError. Catch it to handle the failure yourself:
+```
+try:
+    subprocess.run(["ls", "/nope"], check=True)
+except subprocess.CalledProcessError as err:
+    print("exit code was", err.returncode)
+```
+
+The exception object still carries .returncode, and .stdout and .stderr when you captured them, so you can log exactly what happened.
+
+#### What this node introduces
+    result.returncode holds the command's exit code (0 means success).
+    check=True raises an exception on a non-zero exit.
+    subprocess.CalledProcessError is that exception; catch it to react.
