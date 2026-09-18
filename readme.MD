@@ -2659,3 +2659,38 @@ Every message now appends to that file, each line timestamped and labelled. Unde
     logging.basicConfig(...) configures logging once for the program.
     level= sets the threshold; format= sets each line's layout using fields like %(asctime)s and %(levelname)s.
     filename= writes to a file through a file handler instead of the screen.
+
+## 26.The requests library
+Most DevOps automation eventually talks to an HTTP API: checking a health endpoint, triggering a deploy, reading a metric, posting to a chat webhook. In Python, the requests library is how you do that. It turns an HTTP call into a single readable line.
+
+Python ships with a lower-level urllib in the standard library, but it's clumsy for everyday work. requests is the community standard, and it's already installed in your lab environment.
+
+##### Importing it
+Bring the library in at the top of your script:
+```
+import requests
+```
+
+If that line runs without an error, the library is available.
+
+##### A GET request
+A GET request asks a server for data. Pass the URL to requests.get and you get back a response object:
+```
+import requests
+r = requests.get("https://api.github.com/repos/python/cpython")
+```
+
+The call blocks until the server answers, then hands you an object that holds everything about the reply: the status code, the headers, and the body.
+
+##### Reading the body
+The response body is available two ways. Use r.text for the body as a string, and r.content for the raw bytes (useful for images or downloads):
+```
+print(r.text)
+```
+
+For a JSON API, you rarely want the raw text. The next node covers turning that body into a Python dictionary and checking whether the request actually succeeded.
+
+##### What this node introduces
+    import requests loads the library.
+    requests.get(url) sends a GET request and returns a response object.
+    r.text is the body as a string; r.content is the raw bytes.
