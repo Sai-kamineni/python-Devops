@@ -1544,3 +1544,190 @@ The message is what a tired engineer reads at 2 a.m. Make it specific. raise Val
 
 ##### Choosing a type
 Use a built-in type that fits: ValueError for a bad value, KeyError for a missing key, FileNotFoundError for a missing file. Matching the type lets callers catch precisely what they expect, the same way you catch the standard library's exceptions.
+
+## 16.Opening and reading files
+The open function is how Python gets at a file. You give it a path and a mode, and it hands back a file object you read from or write to.
+```
+f = open("/etc/hostname", "r")
+```
+The "r" means open for reading, which is also the default. The file object f is your handle to the contents.
+
+##### Reading the whole file
+read() pulls the entire file into a single string:
+```
+f = open("/etc/hostname", "r")
+text = f.read()
+f.close()
+print(text)
+```
+
+close() releases the file. Every file you open should be closed, and the next node shows the clean way to guarantee that.
+
+##### Reading line by line
+Config files and logs are usually line oriented. readlines() gives you a list where each element is one line, newline character included:
+```
+f = open("/etc/hosts", "r")
+lines = f.readlines()
+f.close()
+print(len(lines), "lines")
+```
+
+You can also loop over the file object directly, which reads one line at a time without loading the whole thing into memory:
+```
+f = open("/var/log/dpkg.log", "r")
+for line in f:
+    if " installed " in line:
+        print(line.strip())
+f.close()
+```
+line.strip() trims the trailing newline and any surrounding spaces.
+
+#### Writing files and the with statement
+Calling close() by hand is easy to forget, and a file left open can lose data that Python has buffered but not yet flushed. The with statement fixes this by closing the file for you, even if an error is raised partway through.
+```
+with open("/tmp/report.txt", "w") as f:
+    f.write("build succeeded\n")
+```
+
+When the indented block ends, the file is closed automatically. This is the form you should reach for every time you touch a file.
+
+##### Writing text
+write() takes a string and writes it exactly as given. It does not add a newline, so include \n yourself when you want one:
+```
+with open("/tmp/hosts.txt", "w") as f:
+    f.write("web1\n")
+    f.write("web2\n")
+```
+
+To write a list of lines at once, writelines() takes an iterable of strings and writes them back to back.
+
+#### The modes
+The second argument to open decides what you can do:
+
+"r" opens for reading. This is the default and fails if the file is missing.
+"w" opens for writing and truncates the file to empty first. A brand new file is created if it does not exist.
+"a" opens for appending. Writes go to the end and nothing already in the file is lost.
+The difference between "w" and "a" matters. Opening a log with "w" wipes it on every run; "a" adds to it. Choose deliberately.
+
+#### Paths with pathlib
+The pathlib module represents a filesystem path as an object instead of a raw string. It joins paths correctly on any operating system and bundles the common file operations onto the path itself.
+```
+from pathlib import Path
+config = Path("/etc/myapp/config.yaml")
+```
+##### Building paths
+The / operator joins path pieces, so you never hand-glue strings with slashes again:
+```
+base = Path("/etc/myapp")
+config = base / "config.yaml"
+print(config)          # /etc/myapp/config.yaml
+print(config.name)     # config.yaml
+```
+config.name is the final component, handy when you only want the filename.
+
+##### Checking and reading
+exists() tells you whether the path is really there, which saves you from crashing on a missing file:
+```
+if config.exists():
+    text = config.read_text()
+```
+
+read_text() reads the whole file into a string and write_text() writes a string out, each opening and closing the file for you:
+```
+Path("/tmp/note.txt").write_text("done\n")
+```
+
+##### Listing a directory
+iterdir() yields a Path for every entry in a folder:
+```
+for entry in Path("/etc").iterdir():
+    print(entry.name)
+```
+
+## 17.What is JSON
+JSON is a text format for structured data. Almost every REST API speaks it, and plenty of config and state files use it too. Learning to move data in and out of JSON is a daily DevOps task.
+
+The reason it feels natural in Python is that JSON maps directly onto types you already know.
+
+##### The shapes
+A JSON document is built from a small set of pieces:
+
+An object, written with {}, becomes a Python dict.
+An array, written with [], becomes a Python list.
+A string in double quotes becomes a str.
+A number becomes an int or float.
+true and false become True and False.
+null becomes None.
+Here is a small JSON document:
+```
+{
+  "service": "api",
+  "port": 8080,
+  "enabled": true,
+  "tags": ["web", "public"]
+}
+```
+
+Read into Python, that is a dict with four keys. data["port"] is the integer 8080, data["enabled"] is True, and data["tags"] is a list of two strings.
+
+##### Why this matters
+Because JSON becomes ordinary dicts and lists, you work with it using everything you already know: indexing, .get(), loops, comprehensions. There is no special JSON object to learn. You parse the text once, then it is just Python data.
+
+The two nodes that follow show the two directions: turning JSON text into Python objects, and turning Python objects back into JSON text.
+
+##### What this node introduces
+JSON objects map to dicts and JSON arrays map to lists.
+Strings, numbers, true/false, and null map to str, int or float, True/False, and None.
+Once parsed, JSON is just dicts and lists you already know how to use.
+
+#### loads and dumps
+The json module in the standard library converts between JSON text and Python objects. Two functions handle strings: loads parses a string into objects, and dumps renders objects back into a string.
+```
+import json
+```
+
+A memory aid: the s on the end stands for string. loads loads from a string, dumps dumps to a string.
+
+##### Parsing a string with loads
+json.loads takes JSON text and gives you Python data:
+```
+import json
+
+raw = '{"service": "api", "port": 8080}'
+data = json.loads(raw)
+print(data["port"])     # 8080
+print(type(data))       # <class 'dict'>
+```
+
+This is exactly what you do with the body of an API response, which arrives as a JSON string.
+
+##### Producing a string with dumps
+json.dumps goes the other way, turning a dict or list into JSON text:
+```
+import json
+
+data = {"service": "api", "port": 8080}
+print(json.dumps(data))
+```
+
+By default the output is packed onto one line. Pass indent to make it readable, which is what you want when a human will read the file:
+```
+print(json.dumps(data, indent=2))
+```
+That prints the object across several lines with two space indentation. Add sort_keys=True to order the keys alphabetically for stable output.
+
+#### Reading and writing JSON files
+Most of the time the JSON you care about lives in a file, not a string variable. The json module has a second pair of functions for that: load reads from an open file, and dump writes to one. Note the missing s, since these work on files rather than strings.
+
+##### Reading a file with load
+Open the file, then hand the file object to json.load:
+```
+import json
+
+with open("/etc/myapp/config.json") as f:
+    config = json.load(f)
+
+print(config["service"])
+```
+
+json.load(f) reads the whole file and parses it in one step, so you get back a dict or list directly. Combined with the with statement, the file is parsed and closed cleanly.
