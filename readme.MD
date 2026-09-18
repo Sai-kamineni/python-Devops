@@ -2909,3 +2909,36 @@ A retry loop must have a limit. After the last attempt fails, re-raise the excep
 time.sleep(seconds) pauses execution.
 A retry loop wraps a risky call in try/except and loops a fixed number of times.
 Exponential backoff doubles the delay between attempts and always caps the number of tries.
+
+##### Scheduling with cron
+Automation usually needs to run on a schedule: a backup every night, a health check every five minutes. On Linux, cron is the scheduler. You don't write cron in Python, you write a Python script that cron calls.
+
+##### The crontab line
+A crontab entry is five time fields followed by the command to run. This runs a script every day at 2:30 am:
+```
+30 2 * * * /usr/bin/python3 /opt/scripts/backup.py
+```
+
+The fields are minute, hour, day of month, month, and day of week. A * means "every".
+
+##### Exit codes matter
+cron decides whether your script succeeded by its exit code, not by what it prints. An exit code of 0 means success; anything else means failure. Python exits 0 automatically when a script finishes normally, and non-zero when an uncaught exception crashes it.
+
+To signal failure on purpose, use sys.exit with a non-zero number:
+````
+import sys
+if not backup_succeeded:
+    sys.exit(1)
+```
+
+A script that catches every error and always exits 0 looks healthy to cron even when it failed. That's how broken backups go unnoticed for months. Let real failures produce a non-zero exit. 
+
+##### Cron runs with a bare environment
+cron does not load your shell profile. The PATH is minimal and your usual environment variables may be missing. Two habits avoid surprises:
+
+    Use absolute paths for the interpreter and the script, as in the line above.
+    Don't assume env vars you set in your shell exist. Set what you need inside the crontab or the script.
+
+##### Robust scripts
+A script you run by hand and a script that runs unattended are held to different standards. Nobody is watching the scheduled one, so it has to report its own health. Three habits you've already met combine into a reliable tool: logging, error handling, and exit codes.
+
