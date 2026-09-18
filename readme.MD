@@ -2859,3 +2859,53 @@ for obj in resp.get("Contents", []):
 ```
 
 Use resp.get("Contents", []) rather than resp["Contents"], because an empty bucket omits the key entirely and a plain lookup would raise.
+
+##### What this node introduces
+    create_bucket(Bucket=...) makes a bucket (name only in us-east-1).
+    put_object(Bucket=, Key=, Body=) uploads an object.
+    list_objects_v2(Bucket=) lists objects under the Contents key.
+
+## 28.Retries and backoff
+Anything that crosses a network fails sometimes: an API times out, a connection drops, a service is briefly overloaded. A one-off script can just crash. A script that runs unattended should try again before giving up. That's a retry loop.
+
+##### time.sleep
+To wait between attempts, use sleep from the built-in time module. It pauses the program for a number of seconds:
+```
+import time
+time.sleep(2)   # pause for two seconds
+```
+
+##### A basic retry loop
+Wrap the risky call in a loop, catch the exception, and try again:
+```
+import time
+for attempt in range(3):
+    try:
+        result = do_the_thing()
+        break
+    except Exception:
+        time.sleep(1)
+```
+
+This tries up to three times, pausing a second after each failure, and stops as soon as one succeeds.
+
+##### Exponential backoff
+Retrying immediately, or on a fixed delay, can make an overloaded service worse by hammering it. Exponential backoff spaces attempts further apart each time, doubling the wait: 1 second, then 2, then 4. You give a struggling service room to recover:
+```
+delay = 1
+for attempt in range(3):
+    try:
+        result = do_the_thing()
+        break
+    except Exception:
+        time.sleep(delay)
+        delay = delay * 2
+```
+
+##### Give up eventually
+A retry loop must have a limit. After the last attempt fails, re-raise the exception or exit with an error, so the failure is visible instead of silently swallowed. Retrying forever just hides a real outage.
+
+#### What this node introduces
+time.sleep(seconds) pauses execution.
+A retry loop wraps a risky call in try/except and loops a fixed number of times.
+Exponential backoff doubles the delay between attempts and always caps the number of tries.
