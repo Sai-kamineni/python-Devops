@@ -1971,3 +1971,13 @@ with open("/root/data/notes.csv", "w", newline="") as f:
 ```
 
 The writer sees the comma inside the value and wraps that field in quotes automatically, producing web1,"high load, investigating". A reader parses it back as two fields, not three. Values with quotes or newlines are escaped the same way. Joining strings with commas yourself would silently corrupt the file the first time a value held a comma.
+
+##### The pattern
+The everyday shape is: open with newline="" and mode "w", make a writer, write a header row, then write the data rows. Let the module worry about commas, quotes, and line endings.
+
+##### What this node introduces
+writerows(rows) writes a list of rows in one call.
+The writer quotes and escapes values containing commas, quotes, or newlines automatically.
+Standard pattern is open with newline="", write a header, write rows.
+
+## 20.The re module
