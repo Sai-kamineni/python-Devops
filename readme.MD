@@ -2731,6 +2731,131 @@ print(data["stargazers_count"])
 From here it's a normal dictionary. Everything you know about indexing keys and looping over lists applies.
 
 #### What this node introduces
-`r.status_code is the numeric HTTP status.
-r.raise_for_status() raises on a 4xx or 5xx response.
-r.json() parses a JSON body into Python objects.`
+    r.status_code is the numeric HTTP status.
+    r.raise_for_status() raises on a 4xx or 5xx response.
+    r.json() parses a JSON body into Python objects.
+
+##### POST, headers, and query params
+A GET request reads. To send data, filter a result, or authenticate, you need three more pieces: POST requests, headers, and query parameters.
+
+##### Query parameters
+Query parameters go on the end of a URL after a ?, like ?userId=1&completed=true. Instead of building that string yourself, pass a dictionary as params and requests encodes it for you:
+```
+r = requests.get(
+    "https://jsonplaceholder.typicode.com/todos",
+    params={"userId": 1},
+)
+```
+
+The request that goes out is .../todos?userId=1. This keeps values safely escaped and your code readable.
+
+##### Headers
+Headers carry metadata about the request: the content type, an API token, a user agent. Pass them as a dictionary with headers:
+```
+headers = {"Authorization": "Bearer my-token"}
+r = requests.get(url, headers=headers)
+```
+
+API tokens almost always ride in an Authorization header like this.
+
+##### POST requests
+A POST request sends data to create or change something. Use requests.post. For a JSON API, pass your dict as json and requests serializes it and sets the content type for you:
+```
+payload = {"title": "deploy", "userId": 1}
+r = requests.post(url, json=payload)
+```
+
+A successful create usually answers with 201. Use data= instead of json= when you need to send form-encoded fields rather than JSON.
+
+#### What this node introduces
+    params={...} adds query parameters to a request.
+    headers={...} sends request headers such as Authorization.
+    requests.post(url, json={...}) sends a JSON POST body.
+
+## 27.What boto3 is
+boto3 is the AWS SDK for Python. Everything you can do in the AWS console or with the aws CLI you can also do from Python code: launch an EC2 instance, upload to S3, read a queue, list IAM users. It is the standard way to automate AWS from a program.
+
+It's already installed in your lab environment. Import it like any library:
+```
+import boto3
+```
+
+##### Clients
+A client is a thin wrapper over the AWS API for one service. You create one by naming the service:
+```
+s3 = boto3.client("s3")
+```
+
+Client methods map almost one to one onto AWS API calls and CLI commands. s3.list_buckets(), s3.create_bucket(...), and s3.put_object(...) line up with what you'd run as aws s3api list-buckets and so on. Clients return plain Python dicts, the same shape as the JSON the API sends back.
+
+##### Resources
+boto3 also offers a higher-level "resource" interface that wraps those same calls in objects, so you write bucket.upload_file(...) instead of passing a bucket name to every call. It reads nicely, but it covers fewer services and AWS now steers new work toward clients.
+
+For DevOps automation, stick with clients. They cover every service, they match the CLI you already know, and every AWS example you'll find online uses them. This topic uses clients throughout.
+
+###### What this node introduces
+    boto3 is the AWS SDK for Python.
+    boto3.client("s3") creates a client for a named service.
+    Clients map onto AWS API calls and return dictionaries; prefer them over the resource interface for automation.
+
+#### Clients and credentials
+Before boto3 can call AWS, it needs two things: which region to talk to, and which credentials to authenticate with. You rarely hard-code either.
+
+##### Region
+Most services are regional. You can set the region when you build the client:
+```
+s3 = boto3.client("s3", region_name="us-east-1")
+```
+
+If you leave it out, boto3 falls back to the AWS_DEFAULT_REGION environment variable or your AWS config file.
+
+##### Where credentials come from
+You never pass your access keys as plain strings in code. boto3 looks for credentials in a fixed order and uses the first it finds:
+
+    Environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+    The shared credentials file at ~/.aws/credentials, written by aws configure.
+    On an EC2 instance or in a container, the IAM role attached to it, fetched automatically.
+
+That last option is the one you want in production: the instance carries a role, boto3 picks up short-lived credentials on its own, and no secret is ever stored on disk.
+
+##### Labs use a mock
+Real AWS calls cost money and need a real account. In these labs there is no live AWS behind boto3. Instead the environment uses moto, a library that stands in for AWS and answers boto3's calls locally. Your code is identical either way, you still write boto3.client("s3") and call the same methods. The mock just means the bucket you create lives in memory instead of in a real account, so you can practice without a bill.
+
+#### What this node introduces
+    region_name= sets the region on a client.
+    boto3 finds credentials from env vars, then ~/.aws/credentials, then an instance role, in that order.
+    Labs replace real AWS with the moto mock; your boto3 code is unchanged.
+
+##### Working with S3
+S3 is object storage: buckets hold objects, and each object is a blob of bytes stored under a key. It's where DevOps work parks artifacts, backups, logs, and static files. Three client calls cover the basics.
+
+##### Create a bucket
+In us-east-1, creating a bucket needs only its name:
+```
+s3 = boto3.client("s3", region_name="us-east-1")
+s3.create_bucket(Bucket="my-artifacts")
+```
+
+Bucket names are global across all of AWS, so real ones must be unique. In every other region create_bucket also needs a CreateBucketConfiguration naming the region, but us-east-1 is the special default that doesn't.
+
+##### Upload an object
+put_object writes an object. You give it the bucket, a key, and the body as bytes:
+```
+s3.put_object(
+    Bucket="my-artifacts",
+    Key="deploy/config.txt",
+    Body=b"version=1.0",
+)
+```
+
+The key can contain slashes like deploy/config.txt. S3 has no real folders, but the console displays those prefixes as if they were.
+
+##### List objects
+list_objects_v2 returns what's in a bucket. The objects come back under a Contents key, each a dict with a Key:
+```
+resp = s3.list_objects_v2(Bucket="my-artifacts")
+for obj in resp.get("Contents", []):
+    print(obj["Key"])
+```
+
+Use resp.get("Contents", []) rather than resp["Contents"], because an empty bucket omits the key entirely and a plain lookup would raise.
