@@ -2236,3 +2236,45 @@ if datetime.now() > deadline:
     .days and .total_seconds() read a duration.
     timedelta(days=..., hours=...) builds a duration to add or subtract.
     Datetimes compare with <, >, and ==.
+
+## 22.The os module
+The os module is Python's door to the operating system: the working directory, the filesystem layout, and the environment. This node covers the path and directory helpers you'll reach for constantly.
+```
+import os
+```
+
+##### Where am I
+os.getcwd() returns the current working directory as a string:
+```
+os.getcwd()   # '/root/project'
+````
+
+##### Listing and creating directories
+os.listdir(path) returns the names in a directory as a list. os.makedirs(path) creates a directory, including any missing parents:
+```
+os.listdir("/root")            # ['project', 'answers', ...]
+os.makedirs("/root/logs/app")  # creates logs and logs/app
+```
+
+Pass exist_ok=True to makedirs so it doesn't error when the folder is already there:
+```
+os.makedirs("/root/logs", exist_ok=True)
+```
+
+##### Building and inspecting paths
+os.path.join joins path pieces with the right separator, which is safer than gluing strings with slashes:
+```
+os.path.join("/root", "logs", "app.log")   # '/root/logs/app.log'
+```
+
+os.path.exists(path) tells you whether a path is there, and os.path.basename and os.path.dirname split a path into its file name and its folder:
+```
+os.path.exists("/root/logs")            # True
+os.path.basename("/root/logs/app.log")  # 'app.log'
+os.path.dirname("/root/logs/app.log")   # '/root/logs'
+```
+
+#### What this node introduces
+- os.getcwd() returns the current directory.
+- os.listdir(path) lists a directory; os.makedirs(path) creates one.
+- os.path.join, os.path.exists, os.path.basename, and os.path.dirname build and inspect paths.
