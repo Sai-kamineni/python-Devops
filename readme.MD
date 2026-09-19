@@ -47,7 +47,7 @@ print(42)
 print("cpu count", 4)           #Pass several values
 ````
 
-#### Variables
+## 3.Variables
 
 `hostname = "web-01"` <br>
 `cpu_count = 4`
