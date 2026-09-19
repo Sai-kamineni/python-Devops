@@ -1,6 +1,6 @@
 # Python
 
-#### Why Python for DevOps
+#### 1.Why Python for DevOps
 Bash is perfect for gluing commands together. The moment a script needs to parse JSON, call an API, retry on failure, or keep its logic readable past fifty lines, bash starts fighting you. That's where Python takes over.
 
 Python runs on every server you'll touch, reads like plain English, and ships with libraries for the exact problems DevOps work throws at you.
