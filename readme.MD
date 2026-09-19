@@ -48,6 +48,7 @@ print("cpu count", 4)           #Pass several values
 ````
 
 ## 3.Variables
+A variable is a name that points at a value. You create one with the equals sign, putting the name on the left and the value on the right:
 
 `hostname = "web-01"` <br>
 `cpu_count = 4`
