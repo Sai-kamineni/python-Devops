@@ -258,8 +258,8 @@ print("Web-01".lower())   # "web-01"
 ##### Splitting into pieces
 .split() breaks a string into a list of pieces. With no argument it splits on runs of whitespace. Give it a separator to split on that instead:
 ```
-"web-01 web-02 db-01".split()      # three items, split on spaces
-"a,b,c".split(",")                  # split on commas
+"web-01 web-02 db-01".split()       # three items, split on spaces  #['web-01', 'web-02', 'db-01']
+"a,b,c".split(",")                  # split on commas               #['a','b','c']
 ```
 
 This is how you pull fields out of a log line or a comma-separated value. Lists get their own topic next, so for now just know .split() is what turns one string into separate fields.
