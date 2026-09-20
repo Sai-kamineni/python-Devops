@@ -3036,3 +3036,37 @@ The script must:
 Run your tool against the seeded log, writing the summary to /root/answers/summary.json:
 
 `loganalyzer.py /root/mission/app.log -o /root/answers/summary.json`
+
+### SOL:
+mkdir -p /root/scripts /root/answers
+cat > /root/scripts/loganalyzer.py <<'EOF'
+import argparse
+import json
+import os
+import re
+import sys
+
+parser = argparse.ArgumentParser(description="Summarize log levels in a log file")
+parser.add_argument("logfile", help="path of the log file to analyze")
+parser.add_argument("-o", "--output", required=True, help="path of the JSON summary to write")
+args = parser.parse_args()
+
+if not os.path.exists(args.logfile):
+    print(f"error: {args.logfile} does not exist", file=sys.stderr)
+    sys.exit(1)
+
+levels = {"DEBUG": 0, "INFO": 0, "WARNING": 0, "ERROR": 0, "CRITICAL": 0}
+pattern = re.compile(r"\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b")
+
+total = 0
+with open(args.logfile) as f:
+    for line in f:
+        match = pattern.search(line)
+        if match:
+            levels[match.group(1)] += 1
+            total += 1
+
+summary = {"total": total, "levels": levels}
+with open(args.output, "w") as f:
+    json.dump(summary, f, indent=2)
+EOF
