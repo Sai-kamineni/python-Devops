@@ -1442,9 +1442,8 @@ Python prints a traceback and exits:
 Traceback (most recent call last):
   File "script.py", line 1, in <module>
     open("/etc/missing.conf")
-```
-
 FileNotFoundError: [Errno 2] No such file or directory: '/etc/missing.conf'
+```
 
 ##### Reading a traceback
 A traceback is not noise, it's a map. Read it bottom to top:
