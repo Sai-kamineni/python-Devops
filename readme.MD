@@ -2610,11 +2610,11 @@ Logging sorts every message into one of five severity levels. Picking the right 
 ##### The five levels
 From least to most severe:
 
-DEBUG is fine-grained detail useful only while diagnosing a problem. Variable values, "entering this function", that sort of thing.
-INFO confirms things are working as expected. "Backup started", "processed 40 records".
-WARNING flags something unexpected that didn't stop the program. "Disk usage at 85 percent", "retrying after a timeout".
-ERROR means an operation failed. "Could not connect to the database", "file not found".
-CRITICAL is a serious failure that may bring the whole program down. "Out of disk", "unrecoverable state".
+- DEBUG is fine-grained detail useful only while diagnosing a problem. Variable values, "entering this function", that sort of thing.
+- INFO confirms things are working as expected. "Backup started", "processed 40 records".
+- WARNING flags something unexpected that didn't stop the program. "Disk usage at 85 percent", "retrying after a timeout".
+- ERROR means an operation failed. "Could not connect to the database", "file not found".
+- CRITICAL is a serious failure that may bring the whole program down. "Out of disk", "unrecoverable state".
 Each level has a matching function:
 ```
 import logging
