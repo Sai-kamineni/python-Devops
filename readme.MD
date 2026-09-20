@@ -564,7 +564,7 @@ You'll see unpacking constantly once loops and dictionaries arrive, since many b
 ## 7.Dictionaries
 A dictionary maps keys to values. Where a list finds items by numeric position, a dictionary finds them by a name you choose. Write one with curly braces and key: value pairs:
 
-'config = {"app": "billing", "port": 8080, "debug": False}'
+`config = {"app": "billing", "port": 8080, "debug": False}`
 
 Each pair joins a key on the left to a value on the right. Here the key "app" maps to the value "billing", and "port" maps to 8080.
 
