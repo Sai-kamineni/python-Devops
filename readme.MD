@@ -2171,10 +2171,11 @@ now.hour     # 14
 These are plain integers, so you can compare them, print them, or feed them into other calculations.
 
 #### What this node introduces
-datetime.now() returns the current date and time.
+```datetime.now() returns the current date and time.
 date.today() returns the current calendar date.
 datetime(y, m, d, ...) and date(y, m, d) build specific values.
 .year, .month, .day, .hour read the parts.
+```
 
 #### Formatting with strftime and strptime
 A datetime prints in a default layout, but reports and filenames need a specific format, and logs arrive as strings you have to read back. Two methods bridge objects and text. strftime turns a datetime into a string, and strptime parses a string into a datetime.
