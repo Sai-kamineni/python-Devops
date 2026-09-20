@@ -3038,6 +3038,7 @@ Run your tool against the seeded log, writing the summary to /root/answers/summa
 `loganalyzer.py /root/mission/app.log -o /root/answers/summary.json`
 
 ### SOL:
+```
 mkdir -p /root/scripts /root/answers
 cat > /root/scripts/loganalyzer.py <<'EOF'
 import argparse
@@ -3070,3 +3071,4 @@ summary = {"total": total, "levels": levels}
 with open(args.output, "w") as f:
     json.dump(summary, f, indent=2)
 EOF
+```
