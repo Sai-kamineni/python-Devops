@@ -2940,7 +2940,7 @@ The fields are minute, hour, day of month, month, and day of week. A * means "ev
 cron decides whether your script succeeded by its exit code, not by what it prints. An exit code of 0 means success; anything else means failure. Python exits 0 automatically when a script finishes normally, and non-zero when an uncaught exception crashes it.
 
 To signal failure on purpose, use sys.exit with a non-zero number:
-````
+```
 import sys
 if not backup_succeeded:
     sys.exit(1)
