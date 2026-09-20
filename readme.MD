@@ -2582,10 +2582,11 @@ A print call always fires, always goes to the same place, and carries no context
 
 ##### What logging adds
 Logging gives you three things print never will:
-
+```
 Severity. Every message has a level, from routine detail up to critical failure, so you can tell what matters at a glance.
 A volume knob. You set a threshold, and messages below it are dropped. Turn up detail while debugging, turn it down in production, without touching the log calls themselves.
 Destinations and format. The same messages can go to the screen, a file, or both, each line stamped with a time and a level.
+```
 
 ##### The first log message
 The simplest use looks a lot like print:
@@ -2597,9 +2598,11 @@ logging.warning("disk space is low")
 Out of the box this prints WARNING:root:disk space is low. The level is right there in the output, which a plain print could never give you. The next nodes cover the levels and how to control where these lines go and what they look like.
 
 #### What this node introduces
+```
 logging is the standard tool for output from scripts that run unattended.
 It adds severity levels, a threshold to filter by, and control over format and destination.
 logging.warning(...) and its siblings replace print for this.
+```
 
 #### Log levels
 Logging sorts every message into one of five severity levels. Picking the right one is what lets you later filter noise from signal.
