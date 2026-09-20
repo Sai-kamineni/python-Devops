@@ -1912,9 +1912,11 @@ with open("/root/data/out.csv", "w", newline="") as f:
 Notice newline="" on every open. The csv module manages line endings itself, and passing newline="" stops Python from adding extra blank lines between rows on some systems. Always open CSV files this way.
 
 What this node introduces
+```
 csv.reader(f) yields each row as a list of strings.
 csv.writer(f) writes rows; writerow takes a list for one line.
 Open CSV files with newline="" so line endings are handled correctly.
+```
 
 #### DictReader and DictWriter
 Reading rows as plain lists means referring to columns by number, and row[1] tells you nothing about what that column holds. DictReader fixes this by using the header row to give every value a name.
