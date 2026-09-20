@@ -2326,7 +2326,7 @@ os.environ["DEPLOY_ENV"] = "staging"
     os.environ.get("NAME", default) reads with a fallback, never raising.
     Assigning to os.environ sets a variable for this process.
 
-#### sys.argv and exit codes
+### sys.argv and exit codes
 The sys module connects your script to how it was run: the arguments on the command line and the exit code it returns. Both matter the moment a script becomes a tool that other scripts call.
 ```
 import sys
