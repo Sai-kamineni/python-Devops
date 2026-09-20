@@ -759,7 +759,7 @@ clean = sorted(set(ips))
 print(clean)   # ['10.0.0.1', '10.0.0.2', '10.0.0.3']
 ```
 
-##9.if, elif, and else
+## 9.if, elif, and else
 An if statement runs a block of code only when a condition is true. Add elif to test more conditions, and else to catch everything left over. This is how a script makes a decision instead of doing the same thing every time.
 
 The basic if
