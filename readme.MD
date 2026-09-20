@@ -2994,3 +2994,45 @@ Put together, a robust job looks like: configure logging, do the work inside try
     Log to a file so unattended runs leave a record.
     Catch errors, log them, then sys.exit non-zero so failures surface.
     Never swallow an error into a silent success.
+
+
+## 29.Project-1
+Project: Log analyzer CLI
+You're the on-call engineer at esc bash. Every service on the fleet writes a plain text log, and when something breaks the first question is always the same: how many warnings and errors are in here, and how bad is it? Reading the file by eye does not scale. Build a small command line tool that turns a log into a level by level summary you can drop into a report or an alert.
+
+##### Set up the project
+Run this first. It seeds the input file for the task:
+```
+curl -fsSL https://raw.githubusercontent.com/Esc-Bash/project-init-scripts/main/python-for-devops/project-1/init.sh | bash
+```
+
+This creates /root/mission/app.log. Every line starts with a timestamp, then a log level, then a message, for example:
+`2026-07-24 10:00:07 INFO request handled ok`
+
+The level is always one of DEBUG, INFO, WARNING, ERROR, or CRITICAL.
+
+##### What to build
+Write /root/scripts/loganalyzer.py. It takes the path of a log file as a positional argument and the path of the summary to write as an -o/--output option:
+
+`loganalyzer.py <input-log> -o <output-json>`
+
+The script must:
+- Exit with code 2 if the log path argument is missing. argparse gives you this behaviour when the argument is required.
+- Exit with code 1, after printing an error to stderr, if the input log file does not exist.
+- Otherwise read the log, use a regular expression to pull the level out of each line, and count how many lines carry each level.
+- Write the result to the output path as JSON with this exact shape:
+
+{
+  "total": <number of log lines with a level>,
+  "levels": {
+    "DEBUG": <count>,
+    "INFO": <count>,
+    "WARNING": <count>,
+    "ERROR": <count>,
+    "CRITICAL": <count>
+  }
+}
+
+Run your tool against the seeded log, writing the summary to /root/answers/summary.json:
+
+`loganalyzer.py /root/mission/app.log -o /root/answers/summary.json`
