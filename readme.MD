@@ -889,8 +889,10 @@ Because collections are falsy when empty, you can check them without comparing l
 servers = []
 if not servers:
     print("no servers to check")
-That reads better than if len(servers) == 0, and it does the same job.
 ```
+
+That reads better than if len(servers) == 0, and it does the same job.
+
 
 ##### None means "no value yet"
 None is Python's stand-in for missing or not-set. It's falsy, which makes it easy to check for:
