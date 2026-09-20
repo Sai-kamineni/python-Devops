@@ -1310,7 +1310,7 @@ data = json.loads('{"status": "ok"}')
 print(data["status"])
 ```
 
-###datetime: dates and times
+##### datetime: dates and times
 The datetime module handles timestamps, which you'll want for log lines and scheduling:
 ```
 import datetime
