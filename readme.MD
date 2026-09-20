@@ -1454,12 +1454,13 @@ The bottom line is where to look first. FileNotFoundError on a path tells you th
 
 ##### Exception types
 Every failure has a type, and the type tells you the category of problem:
-
+```
 FileNotFoundError: the file or directory isn't there.
 KeyError: a dictionary key doesn't exist.
 ValueError: a value has the right type but a wrong content, like int("abc").
 ZeroDivisionError: you divided by zero.
 Knowing the type matters, because handling errors well means catching the specific type you expect, which the next node covers.
+```
 
 #### try and except
 A try/except block lets your script attempt something risky and react when it fails, instead of crashing. You put the code that might raise an exception in the try block, and the recovery code in the except block.
