@@ -589,14 +589,6 @@ Each key appears once. If you write the same key twice, the last value wins:
 d = {"port": 80, "port": 8080}
 print(d)   # {'port': 8080}
 ```
-Splitting a dictionary across lines like this, one pair per line, is the usual style once it grows past two or three keys. The trailing comma after the last pair is allowed and makes edits cleaner.
-
-##### Keys are unique
-Each key appears once. If you write the same key twice, the last value wins:
-```
-d = {"port": 80, "port": 8080}
-print(d)   # {'port': 8080}
-```
 
 ##### Reading a value by key
 Put the key in square brackets:
