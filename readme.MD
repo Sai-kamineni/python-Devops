@@ -2598,11 +2598,10 @@ logging.warning("disk space is low")
 Out of the box this prints WARNING:root:disk space is low. The level is right there in the output, which a plain print could never give you. The next nodes cover the levels and how to control where these lines go and what they look like.
 
 #### What this node introduces
-```
-logging is the standard tool for output from scripts that run unattended.
-It adds severity levels, a threshold to filter by, and control over format and destination.
-logging.warning(...) and its siblings replace print for this.
-```
+- logging is the standard tool for output from scripts that run unattended.
+- It adds severity levels, a threshold to filter by, and control over format and destination.
+- logging.warning(...) and its siblings replace print for this.
+
 
 #### Log levels
 Logging sorts every message into one of five severity levels. Picking the right one is what lets you later filter noise from signal.
